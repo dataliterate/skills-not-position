@@ -1,0 +1,354 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Design Position Generator</title>
+  <script src="jquery.min.js"></script>
+  <script src="underscore.js"></script>
+  <script src="backbone.js"></script>
+  <script src="keyboard.js"></script>
+
+<script>
+var init = function init() {
+  var app = window.app = app || {};
+  var AppRouter = Backbone.Router.extend({
+    routes:{
+      '': 'default'
+    },
+    default: function() {
+      app.AppMainView = new app.MainView({model: app.AppSession});
+      app.AppMainView.render();
+    }
+  });
+
+  app.Router = new AppRouter();
+  app.Skill = Backbone.Model.extend({
+    defaults: {
+      'title': '',
+      'score': 0,
+      'scores': []
+    }
+  });
+  app.Session = Backbone.Model.extend({
+    defaults: {
+      'skillPos': 0
+    },
+    hasNext: function() {
+      if(this.get('skillPos') + 1 < app.AppSkills.length) {
+        return true;
+      }
+      return false;
+    },
+    next: function() {
+      this.set('skillPos', this.get('skillPos') + 1);
+    },
+    getPosition: function() {
+      /**
+      * analysis
+      * - group
+      * -- word, score
+      * -- word, score
+      */
+      var analysis = {};
+      /*
+      var pool = app.AppWords.getWordsByGroup();
+      _.each(pool, function(words) {
+
+      });
+      */
+      app.AppSkills.each(function(skill) {
+        var userScore = skill.get('score');
+        if(_.isUndefined(userScore)) {
+          userScore = 0;
+        }
+        if(!userScore) {
+          return;
+        }
+        _.each(skill.get('scores'), function(wordFactor) {
+          userScore -= 40;
+          wordFactor[0].addToScore(userScore * wordFactor[1]);
+        });
+      });
+
+      var groups = app.AppWords.getGroups();
+      var grouped = {};
+      console.log(groups);
+      _.each(groups, function(group) {
+        var words = app.AppWords.getWordsInGroup(group);
+        grouped[group] = words;
+      });
+      /**
+      grammar
+      --
+      Attitude Level [, Level] Field [Field] [Title] Designer
+      */
+      return _.first(grouped['attitude']).get('title') +
+        ' ' + _.first(grouped['level']).get('title') +
+        ' ' + _.first(grouped['field']).get('title') +
+        ' ' + _.first(grouped['title']).get('title')
+        ;
+    }
+  });
+  app.Skills = Backbone.Collection.extend({
+    currentSkill: function() {
+      return this.at(app.AppSession.get('skillPos'));
+    }
+  });
+  app.MainView = Backbone.View.extend({
+    el: '#app',
+    appTemplate: _.template($('#app-tmpl').html()),
+    /*
+    events: {
+      'keypress #app': 'onKeyDown'
+    },
+    */
+    skillView: null,
+    initialize: function() {
+      this.$el = $(this.el);
+
+      this.listenTo(this.model, 'change:skillPos', this.skillChange);
+      $('body').keydown(_.bind(this.onKeyDown, this));
+    },
+    render: function() {
+      this.$el.html(this.appTemplate());
+      this.skillChange();
+    },
+    eventLog: {},
+    onKeyDown: function(e) {
+      var ENTER_KEY = 13;
+      if(e.keyCode == ENTER_KEY) {
+        this.submitScore();
+        return;
+      }
+      // up, down, shift+up, shift+down
+
+      // numeric input
+      var num = null;
+      if(!isNaN(String.fromCharCode(e.keyCode))) {
+        num = parseInt(String.fromCharCode(e.keyCode));
+      } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
+        num = parseInt(String.fromCharCode(e.keyCode - 48));
+      }
+      if(num === null) {
+        return;
+      }
+      var score = num;
+      // photoshop opacity layer style input
+      if("lastEvent" in this.eventLog && e.timeStamp - this.eventLog.lastEvent.timeStamp < 250) {
+        num = this.eventLog.lastNum.toString() + num.toString();
+        this.eventLog.lastNum = num;
+      } else {
+        this.eventLog.lastNum = num;
+        num = num * 10;
+      }
+      this.eventLog.lastEvent = e;
+      
+
+      this.changeScore(num);
+    },
+    changeScore: function(score) {
+      app.AppSkills.currentSkill().set({score: score});
+    },
+    submitScore: function() {
+      //if last skill saved
+      if(!this.model.hasNext()) {
+        this.showPosition();
+        return;
+      }
+      this.model.next();
+    },
+    skillChange: function() {
+      console.log("SKILL CHANGE");
+      this.skillView = new app.SkillView({model: app.AppSkills.currentSkill()});
+      this.skillView.$el = this.$el.find('#skill');
+      this.skillView.render();
+    },
+    showPosition: function() {
+      var position = this.model.getPosition();
+      alert(position);
+    }
+  });
+  app.SkillView = Backbone.View.extend({
+    template: _.template($('#skill-tmpl').html()),
+    initialize: function() {
+      this.listenTo(this.model, "change:score", this.updateScore);
+    },
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+    },
+    updateScore: function() {
+      this.$el.find('input').val(this.model.get('score'));
+    }
+  });
+  app.AppSession = new app.Session();
+
+  /**
+  grammar
+  --
+  Attitude Level [, Level] Field [Field] [Title] Designer
+  */
+  app.Word = Backbone.Model.extend({
+    defaults: {
+      'title': '',
+      'group': '',
+      'score': 0,
+      'n': 0
+    },
+    addToScore: function(score) {
+      console.log("Adding Score " + this.get('title') + " : " + score);
+      this.set({'score': this.get('score') + score}, {'n': this.get('n') + 1});
+    }
+  });
+  app.Words = Backbone.Collection.extend({
+    addWordsToGroup: function(titles, group) {
+      _.each(titles, _.bind(function(title) {
+        this.add(new app.Word({title: title, group: group}));
+      }, this));
+    },
+    getByTitle: function(title) {
+      return this.filter(function(model) {
+        return (model.get('title').toLowerCase() == title.toLowerCase());
+      });
+    },
+    getWordsByGroup: function() {
+      return this.groupBy(function(word) {
+        return word.get('group');
+      });
+    },
+    getGroups: function() {
+      return _.map(this.getWordsByGroup(), function(x, k) {return k});
+    },
+    getWordsInGroup: function(group) {
+      var words = this.getWordsByGroup()[group];
+      var sortedWords = _.sortBy(words, function(word) {
+        return -1 * (word.get('score') / word.get('n'));
+      })
+      return sortedWords;
+    }
+  });
+  app.AppWords = new app.Words();
+
+/**
+  Attitudes:
+    Enthusiastic, Motivated, Open-minded, Critical
+    Innovating, Refelcted
+  Level:
+    Senior level, Junior level, Experienced, Lead, Head of
+  Field:
+    UX, UI, IxD, Visual, Frontend, Product, Multiscreen
+  Title:
+    Architect, Evanglist
+  */
+  app.AppWords.addWordsToGroup('Enthusiastic, Motivated, Open-minded, Open, Critical, Innovative, Refelcted, Technology-Loving'.split(', '), 'attitude');
+  app.AppWords.addWordsToGroup('Senior level, Junior level, Experienced, Lead, Head of'.split(', '), 'level');
+  app.AppWords.addWordsToGroup('UX, UI, IxD, Visual, Frontend, Product, Multiscreen'.split(', '), 'field');
+  app.AppWords.addWordsToGroup('Architect, Evanglist, Designer, Coder, Engineer'.split(', '), 'title');
+  
+  function w(title, quotient) {
+    console.log(title);
+    console.log(app.AppWords.getByTitle(title));
+
+    return [app.AppWords.getByTitle(title)[0], quotient];
+  }
+
+  app.AppSkills = new app.Skills([
+    {
+      title: 'you are an experienced (4+) visual designer',
+      scores: [
+        w('experienced', 10),
+        w('visual', 10),
+        w('designer', 10)
+      ]
+    },
+    {
+      title: 'you are good in leading a team',
+      scores: [
+        w('Lead', 10),
+      ]
+    },
+    {
+      title: 'you are able to develop visual languages, from idea to product',
+      scores: [
+        w('Visual', 10),
+        w('Product', 10)
+      ]
+    },
+    {
+      title: 'your create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)',
+      scores: [
+        w('Visual', 7),
+        w('UI', 10),
+        w('Multiscreen', 10)
+      ]
+    },
+    {
+      title: 'you share your own ideas and opinion on a blog, on codepen.io, github or twitter',
+      scores: [
+        w('Open', 10),
+        w('Innovative', 7),
+        w('Evanglist', 7)
+      ]
+    },
+    {
+      title: 'you have a passion for interactive design',
+      scores: [
+        w('UI', 10),
+        w('Designer', 10),
+      ]      
+    },
+    {
+      title: 'you are able to rethink your design workflow to produce for ever-changing technologies',
+      scores: [
+        w('Innovative', 10),
+        w('Technology-Loving', 10)
+      ]      
+    },
+    {
+      title: 'you experiment with CSS3 to create stunning visual results',
+      scores: [
+        w('Frontend', 10),
+        w('Technology-Loving', 6),
+        w('Innovative', 6),
+        w('Coder', 4),
+      ]      
+    },
+    {
+      title: 'you have a strong understanding of web development',
+      scores: [
+        w('Frontend', 10),
+        w('Architect', 8)
+      ]      
+    }
+  ]);
+  Backbone.history.start();
+};
+$(init);
+
+</script>
+
+<div id="app">
+
+</div>
+<script type="text/template" id="app-tmpl">
+  <header>
+    <h1>Design Position Finder</h1>
+  </header>
+  <div id="skill">
+
+  </div>
+  <footer>
+    <p>
+      Keyboard here :)<br>
+      a precious tool
+    </p>
+  </footer>
+</script>
+<script type="text/template" id="skill-tmpl">
+<h2><%= title %></h2>
+<input type="text">
+</script>
+<script type="text/template" id="result-tmpl">
+
+</script>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+</body>
+</html>

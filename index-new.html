@@ -2,7 +2,7 @@
 <head>
   <meta charset="utf-8">
   <title>Skillsetter</title>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="jquery.min.js"></script>
   <script src="keyboard.js"></script>
   <script src="jquery.columnhover.js"></script>
   <style type="text/css">
@@ -420,9 +420,8 @@ you share your own ideas and opinion on a blog, on codepen.io, github or twitter
   <div class="skalculator">
     <div class="title">
       <h1>
-        We DO NOT want designers to fit into a <em>position</em>.
-        We DO want designers with great <em>skills</em> and <em>attitude</em>.<br />
-        Rate the following statements to find your position at precious:
+        <!--Design Position Generator-->
+        Score yourself from 1-100 - use your keyboard
       </h1>
     </div>
     <!--
@@ -440,11 +439,7 @@ you share your own ideas and opinion on a blog, on codepen.io, github or twitter
       <div id="scores">
         <input type="text" id="score" value="50">
         <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
-        <div class="hint">
-          <p>
-            give yourself a score from 1-100 - use your keyboard
-          </p>
-        </div>
+        <input type="submit" id="submit" value="↵">
       </div>
       <div class="submit">
         <input type="submit" id="submit" value="↵">
@@ -456,5 +451,6 @@ you share your own ideas and opinion on a blog, on codepen.io, github or twitter
       </p>
     </div>
   </div>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 </body>
 </html>
