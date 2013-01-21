@@ -6,7 +6,35 @@
   <script src="underscore.js"></script>
   <script src="backbone.js"></script>
   <script src="keyboard.js"></script>
-
+<style type="text/css">
+label {
+  display: block;
+  float: left;
+  width: 200px;
+}
+.words {
+  float: left;
+  width: 100%;
+}
+.word-group {
+  float: left;
+  width: 50%;
+  height: 250px;
+}
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+li {
+  display: block;
+  width: 100%;
+  margin: 40px 0;
+  padding-bottom: 40px;
+  border-bottom: 5px solid #CCC;
+  float: left;
+}
+</style>
 <script>
 var init = function init() {
   var app = window.app = app || {};
@@ -15,6 +43,10 @@ var init = function init() {
       '': 'default'
     },
     default: function() {
+
+      app.AppSession = new app.Session();
+      app.AppSession.skills = app.AppSkills;
+      app.AppSession.words = app.AppWords;
       app.AppMainView = new app.MainView({model: app.AppSession});
       app.AppMainView.render();
     }
@@ -25,13 +57,39 @@ var init = function init() {
     defaults: {
       'title': '',
       'score': 0,
-      'scores': []
+      'quantifiers': []
+    },
+    test: function() {
+    },
+    doExport: function() {
+      /*
+      {
+        title: 'you are an experienced (4+) visual designer',
+        quantifiers: [
+          w('experienced', 10),
+          w('visual', 10),
+          w('designer', 10)
+        ]
+      },
+      */
+      var e = '';
+      e += "{\n";
+      e += "  title:'" + this.get('title') + "'\n";
+      e += "  quantifiers: [\n";
+      _.each(this.get('quantifiers'), function(q) {
+        e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
+      });
+      e += "  ]\n";
+      e += "}\n";
+      return e;
     }
   });
   app.Session = Backbone.Model.extend({
     defaults: {
       'skillPos': 0
     },
+    words: null,
+    skills: null,
     hasNext: function() {
       if(this.get('skillPos') + 1 < app.AppSkills.length) {
         return true;
@@ -63,7 +121,7 @@ var init = function init() {
         if(!userScore) {
           return;
         }
-        _.each(skill.get('scores'), function(wordFactor) {
+        _.each(skill.get('quantifiers'), function(wordFactor) {
           userScore -= 40;
           wordFactor[0].addToScore(userScore * wordFactor[1]);
         });
@@ -91,6 +149,22 @@ var init = function init() {
   app.Skills = Backbone.Collection.extend({
     currentSkill: function() {
       return this.at(app.AppSession.get('skillPos'));
+    },
+    doExport: function() {
+      var e = '[';
+      this.each(function(skill) {
+        e += "{\n";
+        e += "  title: '" + skill.get('title') + "'\n";
+        e += "  quantifiers: [\n";
+        _.each(skill.get('quantifiers'), function(q) {
+          e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
+        });
+        e = e.substr(0, e.length - 2) + "\n";
+        e += "  ]\n";
+        e += "}\n";
+      });
+      e += ']';
+      console.log(e);
     }
   });
   app.MainView = Backbone.View.extend({
@@ -111,6 +185,7 @@ var init = function init() {
     render: function() {
       this.$el.html(this.appTemplate());
       this.skillChange();
+      this.setupView();
     },
     eventLog: {},
     onKeyDown: function(e) {
@@ -157,7 +232,6 @@ var init = function init() {
       this.model.next();
     },
     skillChange: function() {
-      console.log("SKILL CHANGE");
       this.skillView = new app.SkillView({model: app.AppSkills.currentSkill()});
       this.skillView.$el = this.$el.find('#skill');
       this.skillView.render();
@@ -165,6 +239,99 @@ var init = function init() {
     showPosition: function() {
       var position = this.model.getPosition();
       alert(position);
+    },
+    setupView: function() {
+      this.setupView = new app.SetupView({model: this.model});
+      this.setupView.$el = this.$el.find('#setup');
+      this.setupView.render();
+    }
+  });
+  app.SetupView = Backbone.View.extend({
+    template: _.template($('#setup-tmpl').html()),
+    views: [],
+    initialize: function() {
+      
+    },
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+      this.model.skills.each(_.bind(function(skillModel) {
+        var skillSetupView = new app.SetupSkillView({model: skillModel});
+        this.views.push(skillSetupView);
+        skillSetupView.render()
+        this.$el.find('ul').append(skillSetupView.el);
+      }, this));
+      
+    },
+    updateScore: function() {
+      this.$el.find('input').val(this.model.get('score'));
+    }
+  });
+  app.SetupSkillView = Backbone.View.extend({
+    template: _.template($('#setup-skill-tmpl').html()),
+    events: {
+      'change input': 'inputChange'
+    },
+    initialize: function() {
+      
+    },
+    render: function() {
+      this.$el = $('<li></li>');
+      var data = this.model.toJSON();
+      data.skillid = '';
+      data.words = this.getWordsInterface();
+      this.$el.html(this.template(data));
+      this.el = this.$el;
+      this.delegateEvents();
+    },
+    getWordsInterface: function() {
+      console.log(this.model);
+      // DUCK TAPE PROGRAMMING::
+      var grouped = app.AppSession.words.getWordsByGroup();
+      var html = '';
+      var that = this;
+      _.each(grouped, function(words, group) {
+        html += '<div class="word-group"><h4>' + group + '</h4>';
+        _.each(words, function(word) {
+          var value = 0;
+          value = that.getQuantifier(word);
+          html += '<label>' + word.get('title') + '</label>';
+          html += '<input name="' + word.get('title') + '" type="range" min="0" max="10" step="1" value="' + value + '"><br />';
+        })
+        html += '</div>';
+      });
+      return html;
+    },
+    getQuantifier: function(word) {
+      var quantifiers = this.model.get('quantifiers');
+      var v = 0;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word.get('title')) {
+          v = q[1];
+        }
+      });
+      return v;
+    },
+    setQuantifier: function(word, score) {
+      var quantifiers = this.model.get('quantifiers');
+      var newQuantifiers = [];
+      var v = 0;
+      var set = false;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word) {
+          q[1] = score;
+          set = true;
+        }
+        newQuantifiers.push([q[0], q[1]]);
+      });
+      if(!set) {
+        newQuantifiers.push([app.AppWords.getByTitle(word)[0], score]);
+      }
+      this.model.set({'quantifiers': newQuantifiers});
+    },
+    inputChange: function(e) {
+      var $input = $(e.currentTarget);
+      var name = $input.attr('name');
+      this.setQuantifier($input.attr('name'), $input.val());
     }
   });
   app.SkillView = Backbone.View.extend({
@@ -179,7 +346,6 @@ var init = function init() {
       this.$el.find('input').val(this.model.get('score'));
     }
   });
-  app.AppSession = new app.Session();
 
   /**
   grammar
@@ -244,16 +410,13 @@ var init = function init() {
   app.AppWords.addWordsToGroup('Architect, Evanglist, Designer, Coder, Engineer'.split(', '), 'title');
   
   function w(title, quotient) {
-    console.log(title);
-    console.log(app.AppWords.getByTitle(title));
-
     return [app.AppWords.getByTitle(title)[0], quotient];
   }
 
   app.AppSkills = new app.Skills([
     {
       title: 'you are an experienced (4+) visual designer',
-      scores: [
+      quantifiers: [
         w('experienced', 10),
         w('visual', 10),
         w('designer', 10)
@@ -261,20 +424,20 @@ var init = function init() {
     },
     {
       title: 'you are good in leading a team',
-      scores: [
+      quantifiers: [
         w('Lead', 10),
       ]
     },
     {
       title: 'you are able to develop visual languages, from idea to product',
-      scores: [
+      quantifiers: [
         w('Visual', 10),
         w('Product', 10)
       ]
     },
     {
       title: 'your create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)',
-      scores: [
+      quantifiers: [
         w('Visual', 7),
         w('UI', 10),
         w('Multiscreen', 10)
@@ -282,7 +445,7 @@ var init = function init() {
     },
     {
       title: 'you share your own ideas and opinion on a blog, on codepen.io, github or twitter',
-      scores: [
+      quantifiers: [
         w('Open', 10),
         w('Innovative', 7),
         w('Evanglist', 7)
@@ -290,21 +453,21 @@ var init = function init() {
     },
     {
       title: 'you have a passion for interactive design',
-      scores: [
+      quantifiers: [
         w('UI', 10),
         w('Designer', 10),
       ]      
     },
     {
       title: 'you are able to rethink your design workflow to produce for ever-changing technologies',
-      scores: [
+      quantifiers: [
         w('Innovative', 10),
         w('Technology-Loving', 10)
       ]      
     },
     {
       title: 'you experiment with CSS3 to create stunning visual results',
-      scores: [
+      quantifiers: [
         w('Frontend', 10),
         w('Technology-Loving', 6),
         w('Innovative', 6),
@@ -313,7 +476,7 @@ var init = function init() {
     },
     {
       title: 'you have a strong understanding of web development',
-      scores: [
+      quantifiers: [
         w('Frontend', 10),
         w('Architect', 8)
       ]      
@@ -335,6 +498,9 @@ $(init);
   <div id="skill">
 
   </div>
+  <div id="setup">
+
+  </div>
   <footer>
     <p>
       Keyboard here :)<br>
@@ -345,6 +511,19 @@ $(init);
 <script type="text/template" id="skill-tmpl">
 <h2><%= title %></h2>
 <input type="text">
+</script>
+<script type="text/template" id="setup-tmpl">
+<h2>Setup</h2>
+<ul>
+</ul>
+</script>
+<script type="text/template" id="setup-skill-tmpl">
+<div class="<%= skillid %>">
+  <h3><%= title %></h3>
+  <div class="words">
+    <%= words %>
+  </div>
+</div>
 </script>
 <script type="text/template" id="result-tmpl">
 
