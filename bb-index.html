@@ -7,6 +7,171 @@
   <script src="backbone.js"></script>
   <script src="keyboard.js"></script>
 <style type="text/css">
+    ::selection {
+      background: #09F; /* Safari */
+    }
+    ::-moz-selection {
+      background: #09F; /* Firefox */
+    }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      background-color: #BBB;
+      text-align: center;
+      height: 100%;
+      font-size: 25px;
+      color: #FFF;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      line-height: 1em;
+    }
+    header {
+      border-bottom: 2px solid #08D;
+      font-weight: normal;
+      color: #09f;
+      margin: 0 auto 20px;
+      font-size: 16px;
+      line-height: 24px;
+      padding: 40px 0 20px;
+      text-align: left;
+      background-color: #CCC;
+    }
+    header h1 {
+      padding: 0 40px;
+      font-weight: bold;
+      color: #09f;
+      margin: 0 auto 20px;
+      font-size: 16px;
+      line-height: 24px;
+    }
+    h2 {
+      color: #FFF;
+      width: 50%;
+      margin: 0 auto 40px;
+      font-weight: normal;
+      font-size: 60px;
+      line-height: 80px;
+    }
+    input[type="text"] {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: #FFF;
+      font-weight: bold;
+      height: 80px;
+      text-align: center;
+      font-size: 50px;
+      border: 4px solid #FFF;
+      background-color: #CCC;
+      width: 20%;
+      outline: none;
+      -webkit-transition: background-color 800ms linear;
+      border-radius: 2px;
+    }
+    input.flash {
+      background-color: #09F;
+      -webkit-transition: background-color 0 linear;
+    }
+    input::selection {
+      background: #09F; /* Safari */
+    }
+    .submit {
+      margin-top: 40px;
+    }
+    input[type="submit"] {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: #000;
+      font-weight: bold;
+      height: 80px;
+      line-height: 80px;
+      text-align: center;
+      font-size: 50px;
+      border: 4px solid #FFF;
+      background-color: #FFF;
+      width: 20%;
+      border-radius: 20px;
+      outline: none;
+    }
+    footer {
+      margin: 40px auto;
+      width: 490px;
+    }
+kbd {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border: 1px solid #000;
+  border-radius: 2px;
+  display: block;
+  float: left;
+  margin: 0 5px 0 0;
+  font-size: 15px;
+  color: #000;
+}
+.smaller {
+  font-size: 10px;
+}
+.d {
+  opacity: 0.3;
+}
+.enter {
+  float: left;
+}
+.enter-1 {
+  clear: left;
+  float: left;
+  width: 10px;
+  height: 30px;
+  border: 1px solid #000;
+  border-radius: 2px 0 0 2px;
+  border-right: none;
+}
+.enter-2 {
+  float: left;
+  border: 1px solid #000;
+  border-radius: 2px;
+  height: 70px;
+  width: 30px;
+}
+.enter-3 {
+  border: none;
+  border-radius: 0;
+  border-left: 1px solid #BBB;
+  height: 30px;
+  width: 30px;
+  line-height: 35px;
+  position: relative;
+  left: -1;
+}
+.arrows {
+  float: left;
+  position: relative;
+  top: -69px;
+  left: 40px;
+}
+.arrows-first-row kbd {
+  position: relative;
+  left: 37px;
+}
+.arrows-second-row {
+  clear: left;
+  margin-top: -5px;
+}
+.keyboard {
+  margin-top: 80px;
+  opacity: 0.6;
+}
+.
+.first-row {
+  float: left;
+}
+.second-row {
+  float: left;
+  margin: 5px 0 0 10px;
+  clear: left;
+  position: relative;
+  top: -37px;
+}
 label {
   display: block;
   float: left;
@@ -33,6 +198,13 @@ li {
   padding-bottom: 40px;
   border-bottom: 5px solid #CCC;
   float: left;
+}
+#setup {
+  display: none;
+}
+#app {
+  width: 100%;
+  margin: 0 auto;
 }
 </style>
 <script>
@@ -86,7 +258,8 @@ var init = function init() {
   });
   app.Session = Backbone.Model.extend({
     defaults: {
-      'skillPos': 0
+      'skillPos': 0,
+      'analysed': false
     },
     words: null,
     skills: null,
@@ -106,30 +279,30 @@ var init = function init() {
       * -- word, score
       * -- word, score
       */
-      var analysis = {};
-      /*
-      var pool = app.AppWords.getWordsByGroup();
-      _.each(pool, function(words) {
-
-      });
-      */
-      app.AppSkills.each(function(skill) {
-        var userScore = skill.get('score');
-        if(_.isUndefined(userScore)) {
-          userScore = 0;
-        }
-        if(!userScore) {
-          return;
-        }
-        _.each(skill.get('quantifiers'), function(wordFactor) {
+      
+      if(!this.get('analysed')) {
+        app.AppSkills.each(function(skill) {
+          var userScore = skill.get('score');
+          if(_.isUndefined(userScore)) {
+            userScore = 0;
+          }
+          if(!userScore || userScore == 0) {
+            console.log("RETURNING");
+            return;
+          }
+          console.log("\n");
+          console.log(skill.get('title'));
+          console.log(userScore);
           userScore -= 40;
-          wordFactor[0].addToScore(userScore * wordFactor[1]);
+          _.each(skill.get('quantifiers'), function(wordFactor) {
+            wordFactor[0].addToScore(userScore * wordFactor[1]);
+          });
         });
-      });
+        this.set({analysed: true});
+      }
 
       var groups = app.AppWords.getGroups();
       var grouped = {};
-      console.log(groups);
       _.each(groups, function(group) {
         var words = app.AppWords.getWordsInGroup(group);
         grouped[group] = words;
@@ -142,6 +315,7 @@ var init = function init() {
       return _.first(grouped['attitude']).get('title') +
         ' ' + _.first(grouped['level']).get('title') +
         ' ' + _.first(grouped['field']).get('title') +
+        ' ' + grouped['field'][1].get('title') +
         ' ' + _.first(grouped['title']).get('title')
         ;
     }
@@ -154,15 +328,16 @@ var init = function init() {
       var e = '[';
       this.each(function(skill) {
         e += "{\n";
-        e += "  title: '" + skill.get('title') + "'\n";
+        e += "  title: '" + skill.get('title') + "',\n";
         e += "  quantifiers: [\n";
         _.each(skill.get('quantifiers'), function(q) {
           e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
         });
         e = e.substr(0, e.length - 2) + "\n";
         e += "  ]\n";
-        e += "}\n";
+        e += "},\n";
       });
+      e = e.substr(0, e.length - 2) + "\n";
       e += ']';
       console.log(e);
     }
@@ -170,6 +345,7 @@ var init = function init() {
   app.MainView = Backbone.View.extend({
     el: '#app',
     appTemplate: _.template($('#app-tmpl').html()),
+    resultTemplate: _.template($('#result-tmpl').html()),
     /*
     events: {
       'keypress #app': 'onKeyDown'
@@ -185,7 +361,7 @@ var init = function init() {
     render: function() {
       this.$el.html(this.appTemplate());
       this.skillChange();
-      this.setupView();
+      //this.setupView();
     },
     eventLog: {},
     onKeyDown: function(e) {
@@ -238,7 +414,9 @@ var init = function init() {
     },
     showPosition: function() {
       var position = this.model.getPosition();
-      alert(position);
+      console.log(position);
+      var html = this.resultTemplate({position: position});
+      this.$el.find('#skill').html(html);
     },
     setupView: function() {
       this.setupView = new app.SetupView({model: this.model});
@@ -343,7 +521,7 @@ var init = function init() {
       this.$el.html(this.template(this.model.toJSON()));
     },
     updateScore: function() {
-      this.$el.find('input').val(this.model.get('score'));
+      this.$el.find('#score').val(this.model.get('score'));
     }
   });
 
@@ -361,7 +539,10 @@ var init = function init() {
     },
     addToScore: function(score) {
       console.log("Adding Score " + this.get('title') + " : " + score);
-      this.set({'score': this.get('score') + score}, {'n': this.get('n') + 1});
+      this.set({'score': this.get('score') + score, 'n': this.get('n') + 1});
+    },
+    getAvgScore: function() {
+      return this.get('score') / this.get('n');
     }
   });
   app.Words = Backbone.Collection.extend({
@@ -385,9 +566,13 @@ var init = function init() {
     },
     getWordsInGroup: function(group) {
       var words = this.getWordsByGroup()[group];
+      console.log("GROUP");
       var sortedWords = _.sortBy(words, function(word) {
-        return -1 * (word.get('score') / word.get('n'));
-      })
+        console.log(word.get('title') + ' ' + (word.get('score') / 12) + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
+        //return -1 * (word.get('score') / word.get('n'));
+        return -1 * (word.get('score') / 12);
+      });
+      console.log(sortedWords);
       return sortedWords;
     }
   });
@@ -414,74 +599,190 @@ var init = function init() {
   }
 
   app.AppSkills = new app.Skills([
-    {
-      title: 'you are an experienced (4+) visual designer',
-      quantifiers: [
-        w('experienced', 10),
-        w('visual', 10),
-        w('designer', 10)
-      ]
-    },
-    {
-      title: 'you are good in leading a team',
-      quantifiers: [
-        w('Lead', 10),
-      ]
-    },
-    {
-      title: 'you are able to develop visual languages, from idea to product',
-      quantifiers: [
-        w('Visual', 10),
-        w('Product', 10)
-      ]
-    },
-    {
-      title: 'your create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)',
-      quantifiers: [
-        w('Visual', 7),
-        w('UI', 10),
-        w('Multiscreen', 10)
-      ]
-    },
-    {
-      title: 'you share your own ideas and opinion on a blog, on codepen.io, github or twitter',
-      quantifiers: [
-        w('Open', 10),
-        w('Innovative', 7),
-        w('Evanglist', 7)
-      ]
-    },
-    {
-      title: 'you have a passion for interactive design',
-      quantifiers: [
-        w('UI', 10),
-        w('Designer', 10),
-      ]      
-    },
-    {
-      title: 'you are able to rethink your design workflow to produce for ever-changing technologies',
-      quantifiers: [
-        w('Innovative', 10),
-        w('Technology-Loving', 10)
-      ]      
-    },
-    {
-      title: 'you experiment with CSS3 to create stunning visual results',
-      quantifiers: [
-        w('Frontend', 10),
-        w('Technology-Loving', 6),
-        w('Innovative', 6),
-        w('Coder', 4),
-      ]      
-    },
-    {
-      title: 'you have a strong understanding of web development',
-      quantifiers: [
-        w('Frontend', 10),
-        w('Architect', 8)
-      ]      
-    }
-  ]);
+{
+  title: 'you are an experienced (4+) visual designer',
+  quantifiers: [
+    w('Experienced', 9),
+    w('Visual', 10),
+    w('Designer', 10),
+    w('Senior level', 4)
+  ]
+},
+{
+  title: 'you have the experience and ability to lead a project',
+  quantifiers: [
+    w('Lead', 10),
+    w('Senior level', 5),
+    w('Head of', 2)
+  ]
+},
+{
+  title: 'you are able to develop visual languages, from idea to product',
+  quantifiers: [
+    w('Visual', 10),
+    w('Product', 10),
+    w('Designer', 8),
+    w('Experienced', 2),
+    w('Senior level', 3)
+  ]
+},
+{
+  title: 'your create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)',
+  quantifiers: [
+    w('Visual', 7),
+    w('UI', 10),
+    w('Multiscreen', 10),
+    w('Innovative', 5),
+    w('Designer', 2)
+  ]
+},
+{
+  title: 'you share your own ideas and opinion on a blog, on codepen.io, github or twitter',
+  quantifiers: [
+    w('Open', 0),
+    w('Innovative', 0),
+    w('Evanglist', 7),
+    w('Open-minded', 10),
+    w('Refelcted', 7),
+    w('Motivated', 2),
+    w('Frontend', 4),
+    w('Designer', 2),
+    w('Coder', 4)
+  ]
+},
+{
+  title: 'you have a passion for interactive design',
+  quantifiers: [
+    w('UI', 0),
+    w('Designer', 10),
+    w('IxD', 10),
+    w('UX', 2),
+    w('Motivated', 5)
+  ]
+},
+{
+  title: 'you reflect, rethink and improve your design workflow',
+  quantifiers: [
+    w('Innovative', 10),
+    w('Technology-Loving', 0),
+    w('Evanglist', 9),
+    w('Refelcted', 6),
+    w('Critical', 3)
+  ]
+},
+{
+  title: 'you experiment with CSS3 to create stunning visual results',
+  quantifiers: [
+    w('Frontend', 10),
+    w('Technology-Loving', 8),
+    w('Innovative', 6),
+    w('Coder', 6),
+    w('Designer', 8),
+    w('Visual', 9)
+  ]
+},
+{
+  title: 'you have a strong understanding of web development',
+  quantifiers: [
+    w('Frontend', 10),
+    w('Architect', 8),
+    w('Engineer', 9),
+    w('Technology-Loving', 7),
+    w('Experienced', 3),
+    w('Senior level', 3)
+  ]
+},
+{
+  title: 'you have natural mentoring instincts to lead and care for fellow team members',
+  quantifiers: [
+    w('Lead', 10),
+    w('Evanglist', 10),
+    w('Designer', 2),
+    w('Architect', 2),
+    w('Enthusiastic', 2)
+  ]
+},
+{
+  title: 'you have the willingness to share your knowledge',
+  quantifiers: [
+    w('Open', 10),
+    w('Evanglist', 2)
+  ]
+},
+{
+  title: 'you have impressive skills in visual storytelling, ideation and sketching',
+  quantifiers: [
+    w('Designer', 6),
+    w('UX', 8),
+    w('Product', 6)
+  ]
+},
+{
+  title: 'you love teamwork and brainstorming sessions',
+  quantifiers: [
+    w('Open-minded', 10),
+    w('Open', 4)
+  ]
+},
+{
+  title: 'you are incurable curios about to all things related to design and technology',
+  quantifiers: [
+    w('Technology-Loving', 10),
+    w('Designer', 0),
+    w('Enthusiastic', 2)
+  ]
+},
+{
+  title: 'you have an healthy obsession for details',
+  quantifiers: [
+    w('Motivated', 2),
+    w('Visual', 5),
+    w('UI', 2),
+    w('Frontend', 1),
+    w('Designer', 2),
+    w('Coder', 0)
+  ]
+},
+{
+  title: 'you design interactions from a user\'s perspective',
+  quantifiers: [
+    w('UX', 10),
+    w('UI', 9),
+    w('Designer', 10)
+  ]
+},
+{
+  title: 'you work in agile way',
+  quantifiers: [
+    w('Open', 6),
+    w('Motivated', 4)
+  ]
+},
+{
+  title: 'you are comfortable using version control, preferably Git',
+  quantifiers: [
+    w('Technology-Loving', 3),
+    w('Engineer', 7),
+    w('Coder', 8),
+    w('Frontend', 5)
+  ]
+},
+{
+  title: 'you are curious and open to learn new things and tools',
+  quantifiers: [
+    w('Motivated', 7),
+    w('Open', 8),
+    w('Designer', 0)
+  ]
+},
+{
+  title: 'you are comfortable presenting to clients',
+  quantifiers: [
+    w('Lead', 6),
+    w('Senior level', 5)
+  ]
+}
+]);
   Backbone.history.start();
 };
 $(init);
@@ -493,7 +794,7 @@ $(init);
 </div>
 <script type="text/template" id="app-tmpl">
   <header>
-    <h1>Design Position Finder</h1>
+    <h1>Rate yourself</h1>
   </header>
   <div id="skill">
 
@@ -502,15 +803,56 @@ $(init);
 
   </div>
   <footer>
-    <p>
-      Keyboard here :)<br>
-      a precious tool
-    </p>
+    <div class="keyboard">
+      <div class="first-row">
+        <kbd>1</kbd>
+        <kbd>2</kbd>
+        <kbd>3</kbd>
+        <kbd>4</kbd>
+        <kbd>5</kbd>
+        <kbd>6</kbd>
+        <kbd>7</kbd>
+        <kbd>8</kbd>
+        <kbd>9</kbd>
+      </div>
+      <div class="enter">
+        <div class="enter-1">
+        </div>
+        <div class="enter-2">
+          <kbd class="enter-3">↵</kbd>
+        </div>
+      </div>
+      <div class="second-row">
+        <kbd class="d">p</kbd>
+        <kbd class="d">r</kbd>
+        <kbd class="d">e</kbd>
+        <kbd class="d">c</kbd>
+        <kbd class="d">i</kbd>
+        <kbd class="d">o</kbd>
+        <kbd class="d">u</kbd>
+        <kbd class="d">s</kbd>
+        <kbd>⇧</kbd>
+      </div>
+      <div class="arrows">
+        <div class="arrows-first-row">
+          <kbd class="smaller">&#x25b2;</kbd>
+        </div>
+        <div class="arrows-second-row">
+        <kbd class="smaller">&#x25c4;</kbd>
+        <kbd class="smaller">&#x25b2;</kbd>
+        <kbd class="smaller">&#x25ba;</kbd>
+        </div>
+      </div>
+    </div>
   </footer>
 </script>
 <script type="text/template" id="skill-tmpl">
 <h2><%= title %></h2>
-<input type="text">
+      <div id="scores">
+        <input type="text" id="score" value="50">
+        <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
+        <input type="submit" id="submit" value="↵">
+      </div>
 </script>
 <script type="text/template" id="setup-tmpl">
 <h2>Setup</h2>
@@ -526,7 +868,7 @@ $(init);
 </div>
 </script>
 <script type="text/template" id="result-tmpl">
-
+<h2><%= position %></h2>
 </script>
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 </body>
