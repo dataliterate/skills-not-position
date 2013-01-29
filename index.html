@@ -1,416 +1,682 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Skillsetter</title>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <title>Design Position Generator</title>
+  <script src="jquery.min.js"></script>
+  <script src="underscore.js"></script>
+  <script src="backbone.js"></script>
   <script src="keyboard.js"></script>
-  <script src="jquery.columnhover.js"></script>
-  <style type="text/css">
-    ::selection {
-      background: #09F; /* Safari */
-    }
-    ::-moz-selection {
-      background: #09F; /* Firefox */
-    }
-    body {
-      font-family: 'Helvetica Neue', Helvetica, Arial;
-      background-color: #CCC;
-      text-align: center;
-      height: 100%;
-      font-size: 25px;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      line-height: 1em;
-    }
-    h1 {
-      color: #FFF;
-      width: 50%;
-      margin: 0 auto 20px;
-      font-weight: normal;
-    }
-    h2 {
-      color: #633;
-      width: 80%;
-      margin: 0 auto;
-      font-weight: normal;
-    }
-    input {
-      border: 1px solid #FFF;
-      background-color: ;
-    }
-    .sign {
-      font-size: 100px;
-      line-height: 100px;
-    }
-    .sign-equal {
-      margin-top: -20px;
-    }
-    input[type="text"] {
-      font-family: 'Helvetica Neue', Helvetica, Arial;
-      color: #FFF;
-      font-weight: bold;
-      height: 80px;
-      text-align: center;
-      font-size: 50px;
-      border: 4px solid #FFF;
-      background-color: #CCC;
-      width: 20%;
-      outline: none;
-      -webkit-transition: background-color 800ms linear;
-    }
-    input.flash {
-      background-color: #09F;
-      -webkit-transition: background-color 0 linear;
-    }
-    input::selection {
-      background: #09F; /* Safari */
-    }
-    .submit {
-      margin-top: 40px;
-    }
-    input[type="submit"] {
-      font-family: 'Helvetica Neue', Helvetica, Arial;
-      color: #000;
-      font-weight: bold;
-      height: 80px;
-      line-height: 80px;
-      text-align: center;
-      font-size: 50px;
-      border: 4px solid #FFF;
-      background-color: #FFF;
-      width: 20%;
-      border-radius: 20px;
-      outline: none;
-    }
-    .indicator {
-      width: 20%;
-      margin: 0 auto;
-    }
+  <link rel="stylesheet" href="styles.css" type="text/css">
+<script>
+var init = function init() {
+  var app = window.app = app || {};
+  var AppRouter = Backbone.Router.extend({
+    routes:{
+      '': 'default'
+    },
+    default: function() {
 
-    .skalculator {
-      margin: 80px 0 0 0;
+      app.AppSession = new app.Session();
+      app.AppSession.skills = app.AppSkills;
+      app.AppSession.words = app.AppWords;
+      app.AppMainView = new app.MainView({model: app.AppSession});
+      app.AppMainView.render();
     }
-    p {
-      border-top: 4px solid #FFF;
-      color: #FFF;
-      width: 50%;
-      margin: 80px auto 20px;
-      font-weight: normal;
-      padding-top: 20px;
-      font-size: 16px;
-      line-height: 24px;
-    }
+  });
 
-    #scores {
-      position: relative;
+  app.Router = new AppRouter();
+  app.Skill = Backbone.Model.extend({
+    defaults: {
+      'title': '',
+      'score': 0,
+      'quantifiers': []
+    },
+    test: function() {
+    },
+    doExport: function() {
+      /*
+      {
+        title: 'You are an experienced (4+) visual designer',
+        quantifiers: [
+          w('experienced', 10),
+          w('visual', 10),
+          w('designer', 10)
+        ]
+      },
+      */
+      var e = '';
+      e += "{\n";
+      e += "  title:'" + this.get('title') + "'\n";
+      e += "  quantifiers: [\n";
+      _.each(this.get('quantifiers'), function(q) {
+        e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
+      });
+      e += "  ]\n";
+      e += "}\n";
+      return e;
     }
-    .indicator-wrapper {
-      padding: 0 2px;
-      height: 20px;
-      position: relative;
-      top: -12;
-    }
-    .indicator-icon {
-      background-color: #FFF;
-      width: 4px;
-      margin-left: -2px;
-      position: relative;
-      height: 20px;
-      left: 100%;
-    }
+  });
+  app.Session = Backbone.Model.extend({
+    defaults: {
+      'skillPos': 0,
+      'analysed': false
+    },
+    words: null,
+    skills: null,
+    length: 7,
+    hasNext: function() {
+      if(this.get('skillPos') + 1 < this.length) {
+        return true;
+      }
+      return false;
+    },
+    next: function() {
+      this.set('skillPos', this.get('skillPos') + 1);
+    },
+    getPosition: function() {
+      /**
+      * analysis
+      * - group
+      * -- word, score
+      * -- word, score
+      */
+      
+      if(!this.get('analysed')) {
+        app.AppSkills.each(function(skill) {
+          var userScore = skill.get('score');
+          if(_.isUndefined(userScore)) {
+            userScore = 0;
+          }
+          if(!userScore || userScore == 0) {
+            console.log("RETURNING");
+            return;
+          }
+          console.log("\n");
+          console.log(skill.get('title'));
+          console.log(userScore);
+          userScore -= 40;
+          _.each(skill.get('quantifiers'), function(wordFactor) {
+            wordFactor[0].addToScore(userScore * wordFactor[1]);
+          });
+        });
+        this.set({analysed: true});
+      }
 
-    a {
-      color: #FFF;
+      var groups = app.AppWords.getGroups();
+      var grouped = {};
+      _.each(groups, function(group) {
+        var words = app.AppWords.getWordsInGroup(group);
+        grouped[group] = words;
+      });
+      /**
+      grammar
+      --
+      Attitude Level [, Level] Field [Field] [Title] Designer
+      */
+      return _.first(grouped['attitude']).get('title') +
+        ' ' + _.first(grouped['level']).get('title') +
+        ' ' + _.first(grouped['field']).get('title') +
+        ' ' + grouped['field'][1].get('title') +
+        ' ' + _.first(grouped['title']).get('title')
+        ;
     }
-
-    .settings {
-      display: none;
+  });
+  app.Skills = Backbone.Collection.extend({
+    currentSkill: function() {
+      return this.at(app.AppSession.get('skillPos'));
+    },
+    doExport: function() {
+      var e = '[';
+      this.each(function(skill) {
+        e += "{\n";
+        e += "  title: '" + skill.get('title') + "',\n";
+        e += "  quantifiers: [\n";
+        _.each(skill.get('quantifiers'), function(q) {
+          e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
+        });
+        e = e.substr(0, e.length - 2) + "\n";
+        e += "  ]\n";
+        e += "},\n";
+      });
+      e = e.substr(0, e.length - 2) + "\n";
+      e += ']';
+      console.log(e);
     }
-    .results {
-      display: none;
-    }
+  });
+  app.MainView = Backbone.View.extend({
+    el: '#app',
+    appTemplate: _.template($('#app-tmpl').html()),
+    resultTemplate: _.template($('#result-tmpl').html()),
+    /*
+    events: {
+      'keypress #app': 'onKeyDown'
+    },
+    */
+    skillView: null,
+    initialize: function() {
+      this.$el = $(this.el);
 
-    table {
-      border-width: 1px;
-      border-spacing: 0px;
-      border-color: gray;
-      border-collapse: separate;
-      background-color: white;
-    }
-    table td {
-      border: 1px solid #CCC;
-      width: 100px;
-      height: 100px;
-      overflow: scroll;
-      text-align: center;
-      font-size: 40px;
-      line-height: 100px;
-      padding: 10px;
-      color: #CCC;
-    }
-
-    td.t {
-      text-align: left;
-      font-size: 12px;
-      line-height: 15px;
-      color: #000;
-    }
-
-    td.v {
-      color: #000;
-    }
-
-    .x {
-      background-color: #CCC;
-    }
-
-    td.hover {
-      background-color: #FF0;
-    }
-
-  </style>
-  <script>
-  var adujustFontsize = function() {
-    $('h1, h2').textfill({ maxFontPixels: 400 });
-  }
-  jQuery(document).ready(function() {
-
-    var lastEvent = null;
-    var lastNum = 0;
-    $('body').keydown(function(e) {
-
+      this.listenTo(this.model, 'change:skillPos', this.skillChange);
+      $('body').keydown(_.bind(this.onKeyDown, this));
+    },
+    render: function() {
+      this.$el.html(this.appTemplate());
+      this.skillChange();
+      //this.setupView();
+    },
+    eventLog: {},
+    onKeyDown: function(e) {
       var ENTER_KEY = 13;
       if(e.keyCode == ENTER_KEY) {
-        submit();
+        this.submitScore();
         return;
       }
+      // up, down, shift+up, shift+down
 
-      if($('#score:focus').size()) {
-        return;
-      }
+      // numeric input
       var num = null;
       if(!isNaN(String.fromCharCode(e.keyCode))) {
         num = parseInt(String.fromCharCode(e.keyCode));
       } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
         num = parseInt(String.fromCharCode(e.keyCode - 48));
       }
-
       if(num === null) {
         return;
       }
-
-      if(lastEvent && e.timeStamp - lastEvent.timeStamp < 250) {
-        num = lastNum.toString() + num.toString();
-        $('#score').val(num);
+      var score = num;
+      // photoshop opacity layer style input
+      if("lastEvent" in this.eventLog && e.timeStamp - this.eventLog.lastEvent.timeStamp < 250) {
+        num = this.eventLog.lastNum.toString() + num.toString();
+        this.eventLog.lastNum = num;
       } else {
-        if(num !== null) {
-          $('#score').val(num * 10);
-        }
+        this.eventLog.lastNum = num;
+        num = num * 10;
       }
-      $('#score').trigger('change');
-      lastEvent = e;
-      lastNum = num;
+      this.eventLog.lastEvent = e;
       
-    });
 
-    $('#score').change(function() {
-      var $score = $(this);
-      var num = $score.val();
-      if(isNaN(num)) {
-        num = 0;
-      } else {
-        num = parseInt(num);
-        if(num > 100) {
-          num = 100;
-        } else if(num < 0) {
-          num = 0;
-        }
+      this.changeScore(num);
+    },
+    changeScore: function(score) {
+      app.AppSkills.currentSkill().set({score: score});
+    },
+    submitScore: function() {
+      //if last skill saved
+      if(!this.model.hasNext()) {
+        this.showPosition();
+        return;
       }
-      $score.val(num);
-      $score.addClass('flash');
-      window.setTimeout(function() {
-        $score.removeClass('flash');
-      }, 250);
-      $('.indicator-icon').css('left', num + '%');
-    });
-    $('#submit').click(function(e) {
-      submit();
-    });
-    $('#results').click(function(e) {
-      e.preventDefault();
-      $('.results').toggle();
-    });
-    function submit() {
-
-      savescore(skill1Id, skill2Id, $('#score').val());
-      savescore(skill2Id, skill1Id, $('#score').val());
-      displayResults();
-      next();
+      this.model.next();
+    },
+    skillChange: function() {
+      this.skillView = new app.SkillView({model: app.AppSkills.currentSkill()});
+      this.skillView.$el = this.$el.find('#skill');
+      this.skillView.render();
+    },
+    showPosition: function() {
+      var position = this.model.getPosition();
+      $('body').addClass('position');
+      $('footer').hide();
+      $('header h1').html('Your position at precious:');
+      var html = this.resultTemplate({position: position});
+      this.$el.find('#skill').html(html);
+    },
+    setupView: function() {
+      this.setupView = new app.SetupView({model: this.model});
+      this.setupView.$el = this.$el.find('#setup');
+      this.setupView.render();
     }
-
-    function displayResults() {
-
-      var cols = skills.length;
-      var h = '<table id="resultstable">';
-      h += '<tr>';
-      h += '<td></td>'
-      for(skill in skills) {
-        h += '<td class="t">' + skills[skill] + '</td>'
-      }
-      h += '</tr>';
-
-      for(var i = 0; i < cols; i++) {
-        h += '<tr>';
-        h += '<td class="t">' + skills[i] + '</td>';
-        for(var j = 0; j < cols; j++) {
-          var score = null;
-          if(i in results && j in results[i]) {
-            score = results[i][j];
-          }
-          if(i == j) {
-            h += '<td class="x"></td>';
-          } else if(score == null) {
-            h += '<td>&mdash;</td>';
-          } else {
-            h += '<td class="v" style="background-color: RGBA(20, 120, 20, ' + (score / 100) + ')">' + score + '</td>';
-          }
-        }
-        h += '</tr>';
-      }
-
-      h += '<tr>';
-      h += '<td></td>'
-      for(skill in skills) {
-        h += '<td class="t">' + skills[skill] + '</td>'
-      }
-      h += '</tr>';
-      h += '</table>'
-
-      $('.results').html(h);
-      
-    }
-
-    function savescore(skillId, skillCombinationId, score) {
-      if(!results[skillId]) {
-        results[skillId] = {};
-        console.log("asd");
-      }
-      var scores = results[skillId];
-      console.log(results);
-      scores[skillCombinationId] = score;
-      results[skillId] = scores;
-    }
-
-    function next() {
-      skill1Id = getRandomSkillThatWasNotUsedOften();
-      skill2Id = getRandomSkillThatWasNotUsedOftenAndWasNotCombinedWith(skill1Id);
-      
-      console.log(skill1Id);
-      console.log(skill2Id);
-      $('#skill-1').text(skills[skill1Id]);
-      $('#skill-2').text(skills[skill2Id]);
-
-    }
-
-    function getRandomSkillThatWasNotUsedOften() { 
-      var id = Math.floor(Math.random() * skills.length);
-
-      var avg = getAverageNumOfScoreEntries();
-      while(results[id] && results[id].length > avg) {
-        var id = Math.floor(Math.random() * skills.length);
-      }
-
-      return id;
-    }
-
-    function getRandomSkillThatWasNotUsedOftenAndWasNotCombinedWith(skillId) { 
-      var id = Math.floor(Math.random() * skills.length);
-      var i = 0;
-      while(id == skillId || (results[id] && skillId in results[id])) {
-        i++;
-        if(i > 100) {
-          console.log("EXITING");
-          break;
-        }
-        var id = Math.floor(Math.random() * skills.length);
-      }
-      return id;
-    }
-
-    function getAverageNumOfScoreEntries() {
-      var numEntries = [];
-      var i = 0;
-      var sum = 0;
-      for(id in results) {
-        i++;
-        numEntries.push(id.length);
-        sum += id.length;
-      }
-      return sum / i;
-    }
-
-    var skill1 = null;
-    var skill2 = null;
-
-    var skills = [];
-    var results = {};
-    function setup() {
-      skills = $('#skills').val().split("\n");
-    }
-
-    $('#score').trigger('change');
-    setup();
-    next();
   });
-  jQuery(window).resize(adujustFontsize);
-  </script>
-</head>
+  app.SetupView = Backbone.View.extend({
+    template: _.template($('#setup-tmpl').html()),
+    views: [],
+    initialize: function() {
+      
+    },
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+      this.model.skills.each(_.bind(function(skillModel) {
+        var skillSetupView = new app.SetupSkillView({model: skillModel});
+        this.views.push(skillSetupView);
+        skillSetupView.render()
+        this.$el.find('ul').append(skillSetupView.el);
+      }, this));
+      
+    },
+    updateScore: function() {
+      this.$el.find('input').val(this.model.get('score'));
+    }
+  });
+  app.SetupSkillView = Backbone.View.extend({
+    template: _.template($('#setup-skill-tmpl').html()),
+    events: {
+      'change input': 'inputChange'
+    },
+    initialize: function() {
+      
+    },
+    render: function() {
+      this.$el = $('<li></li>');
+      var data = this.model.toJSON();
+      data.skillid = '';
+      data.words = this.getWordsInterface();
+      this.$el.html(this.template(data));
+      this.el = this.$el;
+      this.delegateEvents();
+    },
+    getWordsInterface: function() {
+      console.log(this.model);
+      // DUCK TAPE PROGRAMMING::
+      var grouped = app.AppSession.words.getWordsByGroup();
+      var html = '';
+      var that = this;
+      _.each(grouped, function(words, group) {
+        html += '<div class="word-group"><h4>' + group + '</h4>';
+        _.each(words, function(word) {
+          var value = 0;
+          value = that.getQuantifier(word);
+          html += '<label>' + word.get('title') + '</label>';
+          html += '<input name="' + word.get('title') + '" type="range" min="0" max="10" step="1" value="' + value + '"><br />';
+        })
+        html += '</div>';
+      });
+      return html;
+    },
+    getQuantifier: function(word) {
+      var quantifiers = this.model.get('quantifiers');
+      var v = 0;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word.get('title')) {
+          v = q[1];
+        }
+      });
+      return v;
+    },
+    setQuantifier: function(word, score) {
+      var quantifiers = this.model.get('quantifiers');
+      var newQuantifiers = [];
+      var v = 0;
+      var set = false;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word) {
+          q[1] = score;
+          set = true;
+        }
+        newQuantifiers.push([q[0], q[1]]);
+      });
+      if(!set) {
+        newQuantifiers.push([app.AppWords.getByTitle(word)[0], score]);
+      }
+      this.model.set({'quantifiers': newQuantifiers});
+    },
+    inputChange: function(e) {
+      var $input = $(e.currentTarget);
+      var name = $input.attr('name');
+      this.setQuantifier($input.attr('name'), $input.val());
+    }
+  });
+  app.SkillView = Backbone.View.extend({
+    template: _.template($('#skill-tmpl').html()),
+    initialize: function() {
+      this.listenTo(this.model, "change:score", this.updateScore);
+    },
+    render: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+    },
+    updateScore: function() {
+      this.$el.find('#score').val(this.model.get('score'));
+    }
+  });
+
+  /**
+  grammar
+  --
+  Attitude Level [, Level] Field [Field] [Title] Designer
+  */
+  app.Word = Backbone.Model.extend({
+    defaults: {
+      'title': '',
+      'group': '',
+      'score': 0,
+      'n': 0
+    },
+    addToScore: function(score) {
+      console.log("Adding Score " + this.get('title') + " : " + score);
+      this.set({'score': this.get('score') + score, 'n': this.get('n') + 1});
+    },
+    getAvgScore: function() {
+      return this.get('score') / this.get('n');
+    }
+  });
+  app.Words = Backbone.Collection.extend({
+    addWordsToGroup: function(titles, group) {
+      _.each(titles, _.bind(function(title) {
+        this.add(new app.Word({title: title, group: group}));
+      }, this));
+    },
+    getByTitle: function(title) {
+      return this.filter(function(model) {
+        return (model.get('title').toLowerCase() == title.toLowerCase());
+      });
+    },
+    getWordsByGroup: function() {
+      return this.groupBy(function(word) {
+        return word.get('group');
+      });
+    },
+    getGroups: function() {
+      return _.map(this.getWordsByGroup(), function(x, k) {return k});
+    },
+    getWordsInGroup: function(group) {
+      var words = this.getWordsByGroup()[group];
+      console.log("GROUP");
+      var sortedWords = _.sortBy(words, function(word) {
+        console.log(word.get('title') + ' ' + (word.get('score') / 12) + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
+        //return -1 * (word.get('score') / word.get('n'));
+        return -1 * (word.get('score') / 12);
+      });
+      console.log(sortedWords);
+      return sortedWords;
+    }
+  });
+  app.AppWords = new app.Words();
+
+/**
+  Attitudes:
+    Enthusiastic, Motivated, Open-minded, Critical
+    Innovating, Refelcted
+  Level:
+    Senior level, Junior level, Experienced, Lead, Head of
+  Field:
+    UX, UI, IxD, Visual, Frontend, Product, Multiscreen
+  Title:
+    Architect, Evanglist
+  */
+  app.AppWords.addWordsToGroup('Enthusiastic, Motivated, Open-minded, Open, Critical, Innovative, Refelcted, Technology-Loving'.split(', '), 'attitude');
+  app.AppWords.addWordsToGroup('Senior level, Junior level, Experienced, Lead, Head of'.split(', '), 'level');
+  app.AppWords.addWordsToGroup('UX, UI, IxD, Visual, Frontend, Product, Multiscreen'.split(', '), 'field');
+  app.AppWords.addWordsToGroup('Architect, Evanglist, Designer, Coder, Engineer'.split(', '), 'title');
+  
+  function w(title, quotient) {
+    return [app.AppWords.getByTitle(title)[0], quotient];
+  }
+
+  app.AppSkills = new app.Skills(_.shuffle([
+{
+  title: 'I am an experienced (4+) visual designer',
+  quantifiers: [
+    w('Experienced', 9),
+    w('Visual', 10),
+    w('Designer', 10),
+    w('Senior level', 4)
+  ]
+},
+{
+  title: 'I have the experience and ability to lead a project',
+  quantifiers: [
+    w('Lead', 10),
+    w('Senior level', 5),
+    w('Head of', 2)
+  ]
+},
+{
+  title: 'I am able to develop visual languages, from idea to product',
+  quantifiers: [
+    w('Visual', 10),
+    w('Product', 10),
+    w('Designer', 8),
+    w('Experienced', 2),
+    w('Senior level', 3)
+  ]
+},
+{
+  title: 'I create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)',
+  quantifiers: [
+    w('Visual', 7),
+    w('UI', 10),
+    w('Multiscreen', 10),
+    w('Innovative', 5),
+    w('Designer', 2)
+  ]
+},
+{
+  title: 'I share my own ideas and opinion on a blog, on codepen.io, github or twitter',
+  quantifiers: [
+    w('Open', 0),
+    w('Innovative', 0),
+    w('Evanglist', 7),
+    w('Open-minded', 10),
+    w('Refelcted', 7),
+    w('Motivated', 2),
+    w('Frontend', 4),
+    w('Designer', 2),
+    w('Coder', 4)
+  ]
+},
+{
+  title: 'I have a passion for interactive design',
+  quantifiers: [
+    w('UI', 0),
+    w('Designer', 10),
+    w('IxD', 10),
+    w('UX', 2),
+    w('Motivated', 5)
+  ]
+},
+{
+  title: 'I reflect, rethink and improve my design workflow',
+  quantifiers: [
+    w('Innovative', 10),
+    w('Technology-Loving', 0),
+    w('Evanglist', 9),
+    w('Refelcted', 6),
+    w('Critical', 3)
+  ]
+},
+{
+  title: 'I experiment with CSS3 to create stunning visual results',
+  quantifiers: [
+    w('Frontend', 10),
+    w('Technology-Loving', 8),
+    w('Innovative', 6),
+    w('Coder', 6),
+    w('Designer', 8),
+    w('Visual', 9)
+  ]
+},
+{
+  title: 'I have a strong understanding of web development',
+  quantifiers: [
+    w('Frontend', 10),
+    w('Architect', 8),
+    w('Engineer', 9),
+    w('Technology-Loving', 7),
+    w('Experienced', 3),
+    w('Senior level', 3)
+  ]
+},
+{
+  title: 'I have natural mentoring instincts to lead and care for fellow team members',
+  quantifiers: [
+    w('Lead', 10),
+    w('Evanglist', 10),
+    w('Designer', 2),
+    w('Architect', 2),
+    w('Enthusiastic', 2)
+  ]
+},
+{
+  title: 'I have the willingness to share Your knowledge',
+  quantifiers: [
+    w('Open', 10),
+    w('Evanglist', 2)
+  ]
+},
+{
+  title: 'I have impressive skills in visual storytelling, ideation and sketching',
+  quantifiers: [
+    w('Designer', 6),
+    w('UX', 8),
+    w('Product', 6)
+  ]
+},
+{
+  title: 'I love teamwork and brainstorming sessions',
+  quantifiers: [
+    w('Open-minded', 10),
+    w('Open', 4)
+  ]
+},
+{
+  title: 'I am incurable curios about to all things related to design and technology',
+  quantifiers: [
+    w('Technology-Loving', 10),
+    w('Designer', 0),
+    w('Enthusiastic', 2)
+  ]
+},
+{
+  title: 'I have an healthy obsession for details',
+  quantifiers: [
+    w('Motivated', 2),
+    w('Visual', 5),
+    w('UI', 2),
+    w('Frontend', 1),
+    w('Designer', 2),
+    w('Coder', 0)
+  ]
+},
+{
+  title: 'I design interactions from a user\'s perspective',
+  quantifiers: [
+    w('UX', 10),
+    w('UI', 9),
+    w('Designer', 10)
+  ]
+},
+{
+  title: 'I work in an oh so agile way',
+  quantifiers: [
+    w('Open', 6),
+    w('Motivated', 4)
+  ]
+},
+{
+  title: 'I am comfortable using version control, preferably Git',
+  quantifiers: [
+    w('Technology-Loving', 3),
+    w('Engineer', 7),
+    w('Coder', 8),
+    w('Frontend', 5)
+  ]
+},
+{
+  title: 'I am curious and open to learn new things and tools',
+  quantifiers: [
+    w('Motivated', 7),
+    w('Open', 8),
+    w('Designer', 0)
+  ]
+},
+{
+  title: 'I am comfortable presenting to clients',
+  quantifiers: [
+    w('Lead', 6),
+    w('Senior level', 5)
+  ]
+}
+]));
+  Backbone.history.start();
+};
+$(init);
+
+</script>
 <body>
-  <div class="settings">
-    <textarea id="skills">
-you are an experienced (4+) visual designer
-are able to develop visual languages, from idea to product
-you are able to translate wireframes into elegant and user-friendly UIs
-create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)
-have a passion for interactive design and a healthy obsession for details
-you are able to rethink your design workflow to produce for ever-changing technologies
-your design workflow includes coding
-you experiment with CSS3 to create stunning visual results
-you have a strong understanding of web development
-you are comfortable presenting to and discussing with clients
-you are good in leading a team
-you share your own ideas and opinion on a blog, on codepen.io, github or twitter</textarea>
-  </div>
-  <div class="results">
+<div id="app">
+
+</div>
+<script type="text/template" id="app-tmpl">
+  <header>
+    <h1 class="centered">Rate the following statements</h1>
+  </header>
+  <div id="skill">
 
   </div>
-  <div class="skalculator">
-    <h1 class="group">
-      <span id="skill-1">you are good in leading a team</span>
-    </h1>
-    <h1 class="sign">
-      ✕
-    </h1>
-    <h1>
-      <span id="skill-2">have a passion for interactive design and a healthy obsession for details</span>
-    </h1>
-    <h1 class="sign sign-equal">
-      =
-    </h1>
-    <div id="scores">
-      <input type="text" id="score" value="50">
-      <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
-    </div>
-    <div class="submit">
-      <input type="submit" id="submit" value="↵">
-    </div>
-    <p class="help">
-      Use your keyboard form 1-0 to enter a score.<br />
-      Hit ENTER to rate the next combination of skills.<br />
-      <a href="#" id="results">Show results</a>
-    </p>
+  <div id="setup">
+
   </div>
+  <footer>
+    <div class="keyboard">
+      <div class="first-row">
+        <kbd>1</kbd>
+        <kbd>2</kbd>
+        <kbd>3</kbd>
+        <kbd>4</kbd>
+        <kbd>5</kbd>
+        <kbd>6</kbd>
+        <kbd>7</kbd>
+        <kbd>8</kbd>
+        <kbd>9</kbd>
+      </div>
+      <div class="enter">
+        <div class="enter-1">
+        </div>
+        <div class="enter-2">
+          <kbd class="enter-3">↵</kbd>
+        </div>
+      </div>
+      <div class="second-row">
+        <kbd class="d">p</kbd>
+        <kbd class="d">r</kbd>
+        <kbd class="d">e</kbd>
+        <kbd class="d">c</kbd>
+        <kbd class="d">i</kbd>
+        <kbd class="d">o</kbd>
+        <kbd class="d">u</kbd>
+        <kbd class="d">s</kbd>
+        <kbd>⇧</kbd>
+      </div>
+      <div class="arrows">
+        <div class="arrows-first-row">
+          <kbd class="smaller">&#x25b2;</kbd>
+        </div>
+        <div class="arrows-second-row">
+        <kbd class="smaller">&#x25c4;</kbd>
+        <kbd class="smaller">&#x25b2;</kbd>
+        <kbd class="smaller">&#x25ba;</kbd>
+        </div>
+      </div>
+    </div>
+  </footer>
+</script>
+<script type="text/template" id="skill-tmpl">
+<div class="skill">
+<h2><span class="quote">&raquo; </span><%= title %></h2>
+      <div id="scores">
+        <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
+        <p>
+          That is<input type="text" id="score" value="50"><span class="unit">%</span> true.
+          <input type="submit" id="submit" value="↵">
+        </p>
+      </div>
+</div>
+</script>
+<script type="text/template" id="setup-tmpl">
+<h2>Setup</h2>
+<ul>
+</ul>
+</script>
+<script type="text/template" id="setup-skill-tmpl">
+<div class="<%= skillid %>">
+  <h3><%= title %></h3>
+  <div class="words">
+    <%= words %>
+  </div>
+</div>
+</script>
+<script type="text/template" id="result-tmpl">
+<h2><%= position %></h2>
+</script>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 </body>
 </html>

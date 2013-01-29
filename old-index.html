@@ -1,0 +1,416 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Skillsetter</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="keyboard.js"></script>
+  <script src="jquery.columnhover.js"></script>
+  <style type="text/css">
+    ::selection {
+      background: #09F; /* Safari */
+    }
+    ::-moz-selection {
+      background: #09F; /* Firefox */
+    }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      background-color: #CCC;
+      text-align: center;
+      height: 100%;
+      font-size: 25px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      line-height: 1em;
+    }
+    h1 {
+      color: #FFF;
+      width: 50%;
+      margin: 0 auto 20px;
+      font-weight: normal;
+    }
+    h2 {
+      color: #633;
+      width: 80%;
+      margin: 0 auto;
+      font-weight: normal;
+    }
+    input {
+      border: 1px solid #FFF;
+      background-color: ;
+    }
+    .sign {
+      font-size: 100px;
+      line-height: 100px;
+    }
+    .sign-equal {
+      margin-top: -20px;
+    }
+    input[type="text"] {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: #FFF;
+      font-weight: bold;
+      height: 80px;
+      text-align: center;
+      font-size: 50px;
+      border: 4px solid #FFF;
+      background-color: #CCC;
+      width: 20%;
+      outline: none;
+      -webkit-transition: background-color 800ms linear;
+    }
+    input.flash {
+      background-color: #09F;
+      -webkit-transition: background-color 0 linear;
+    }
+    input::selection {
+      background: #09F; /* Safari */
+    }
+    .submit {
+      margin-top: 40px;
+    }
+    input[type="submit"] {
+      font-family: 'Helvetica Neue', Helvetica, Arial;
+      color: #000;
+      font-weight: bold;
+      height: 80px;
+      line-height: 80px;
+      text-align: center;
+      font-size: 50px;
+      border: 4px solid #FFF;
+      background-color: #FFF;
+      width: 20%;
+      border-radius: 20px;
+      outline: none;
+    }
+    .indicator {
+      width: 20%;
+      margin: 0 auto;
+    }
+
+    .skalculator {
+      margin: 80px 0 0 0;
+    }
+    p {
+      border-top: 4px solid #FFF;
+      color: #FFF;
+      width: 50%;
+      margin: 80px auto 20px;
+      font-weight: normal;
+      padding-top: 20px;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    #scores {
+      position: relative;
+    }
+    .indicator-wrapper {
+      padding: 0 2px;
+      height: 20px;
+      position: relative;
+      top: -12;
+    }
+    .indicator-icon {
+      background-color: #FFF;
+      width: 4px;
+      margin-left: -2px;
+      position: relative;
+      height: 20px;
+      left: 100%;
+    }
+
+    a {
+      color: #FFF;
+    }
+
+    .settings {
+      display: none;
+    }
+    .results {
+      display: none;
+    }
+
+    table {
+      border-width: 1px;
+      border-spacing: 0px;
+      border-color: gray;
+      border-collapse: separate;
+      background-color: white;
+    }
+    table td {
+      border: 1px solid #CCC;
+      width: 100px;
+      height: 100px;
+      overflow: scroll;
+      text-align: center;
+      font-size: 40px;
+      line-height: 100px;
+      padding: 10px;
+      color: #CCC;
+    }
+
+    td.t {
+      text-align: left;
+      font-size: 12px;
+      line-height: 15px;
+      color: #000;
+    }
+
+    td.v {
+      color: #000;
+    }
+
+    .x {
+      background-color: #CCC;
+    }
+
+    td.hover {
+      background-color: #FF0;
+    }
+
+  </style>
+  <script>
+  var adujustFontsize = function() {
+    $('h1, h2').textfill({ maxFontPixels: 400 });
+  }
+  jQuery(document).ready(function() {
+
+    var lastEvent = null;
+    var lastNum = 0;
+    $('body').keydown(function(e) {
+
+      var ENTER_KEY = 13;
+      if(e.keyCode == ENTER_KEY) {
+        submit();
+        return;
+      }
+
+      if($('#score:focus').size()) {
+        return;
+      }
+      var num = null;
+      if(!isNaN(String.fromCharCode(e.keyCode))) {
+        num = parseInt(String.fromCharCode(e.keyCode));
+      } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
+        num = parseInt(String.fromCharCode(e.keyCode - 48));
+      }
+
+      if(num === null) {
+        return;
+      }
+
+      if(lastEvent && e.timeStamp - lastEvent.timeStamp < 250) {
+        num = lastNum.toString() + num.toString();
+        $('#score').val(num);
+      } else {
+        if(num !== null) {
+          $('#score').val(num * 10);
+        }
+      }
+      $('#score').trigger('change');
+      lastEvent = e;
+      lastNum = num;
+      
+    });
+
+    $('#score').change(function() {
+      var $score = $(this);
+      var num = $score.val();
+      if(isNaN(num)) {
+        num = 0;
+      } else {
+        num = parseInt(num);
+        if(num > 100) {
+          num = 100;
+        } else if(num < 0) {
+          num = 0;
+        }
+      }
+      $score.val(num);
+      $score.addClass('flash');
+      window.setTimeout(function() {
+        $score.removeClass('flash');
+      }, 250);
+      $('.indicator-icon').css('left', num + '%');
+    });
+    $('#submit').click(function(e) {
+      submit();
+    });
+    $('#results').click(function(e) {
+      e.preventDefault();
+      $('.results').toggle();
+    });
+    function submit() {
+
+      savescore(skill1Id, skill2Id, $('#score').val());
+      savescore(skill2Id, skill1Id, $('#score').val());
+      displayResults();
+      next();
+    }
+
+    function displayResults() {
+
+      var cols = skills.length;
+      var h = '<table id="resultstable">';
+      h += '<tr>';
+      h += '<td></td>'
+      for(skill in skills) {
+        h += '<td class="t">' + skills[skill] + '</td>'
+      }
+      h += '</tr>';
+
+      for(var i = 0; i < cols; i++) {
+        h += '<tr>';
+        h += '<td class="t">' + skills[i] + '</td>';
+        for(var j = 0; j < cols; j++) {
+          var score = null;
+          if(i in results && j in results[i]) {
+            score = results[i][j];
+          }
+          if(i == j) {
+            h += '<td class="x"></td>';
+          } else if(score == null) {
+            h += '<td>&mdash;</td>';
+          } else {
+            h += '<td class="v" style="background-color: RGBA(20, 120, 20, ' + (score / 100) + ')">' + score + '</td>';
+          }
+        }
+        h += '</tr>';
+      }
+
+      h += '<tr>';
+      h += '<td></td>'
+      for(skill in skills) {
+        h += '<td class="t">' + skills[skill] + '</td>'
+      }
+      h += '</tr>';
+      h += '</table>'
+
+      $('.results').html(h);
+      
+    }
+
+    function savescore(skillId, skillCombinationId, score) {
+      if(!results[skillId]) {
+        results[skillId] = {};
+        console.log("asd");
+      }
+      var scores = results[skillId];
+      console.log(results);
+      scores[skillCombinationId] = score;
+      results[skillId] = scores;
+    }
+
+    function next() {
+      skill1Id = getRandomSkillThatWasNotUsedOften();
+      skill2Id = getRandomSkillThatWasNotUsedOftenAndWasNotCombinedWith(skill1Id);
+      
+      console.log(skill1Id);
+      console.log(skill2Id);
+      $('#skill-1').text(skills[skill1Id]);
+      $('#skill-2').text(skills[skill2Id]);
+
+    }
+
+    function getRandomSkillThatWasNotUsedOften() { 
+      var id = Math.floor(Math.random() * skills.length);
+
+      var avg = getAverageNumOfScoreEntries();
+      while(results[id] && results[id].length > avg) {
+        var id = Math.floor(Math.random() * skills.length);
+      }
+
+      return id;
+    }
+
+    function getRandomSkillThatWasNotUsedOftenAndWasNotCombinedWith(skillId) { 
+      var id = Math.floor(Math.random() * skills.length);
+      var i = 0;
+      while(id == skillId || (results[id] && skillId in results[id])) {
+        i++;
+        if(i > 100) {
+          console.log("EXITING");
+          break;
+        }
+        var id = Math.floor(Math.random() * skills.length);
+      }
+      return id;
+    }
+
+    function getAverageNumOfScoreEntries() {
+      var numEntries = [];
+      var i = 0;
+      var sum = 0;
+      for(id in results) {
+        i++;
+        numEntries.push(id.length);
+        sum += id.length;
+      }
+      return sum / i;
+    }
+
+    var skill1 = null;
+    var skill2 = null;
+
+    var skills = [];
+    var results = {};
+    function setup() {
+      skills = $('#skills').val().split("\n");
+    }
+
+    $('#score').trigger('change');
+    setup();
+    next();
+  });
+  jQuery(window).resize(adujustFontsize);
+  </script>
+</head>
+<body>
+  <div class="settings">
+    <textarea id="skills">
+you are an experienced (4+) visual designer
+are able to develop visual languages, from idea to product
+you are able to translate wireframes into elegant and user-friendly UIs
+create stunning interfaces for large HDTVs, tiny mobile phones and everything in between (and beyond!)
+have a passion for interactive design and a healthy obsession for details
+you are able to rethink your design workflow to produce for ever-changing technologies
+your design workflow includes coding
+you experiment with CSS3 to create stunning visual results
+you have a strong understanding of web development
+you are comfortable presenting to and discussing with clients
+you are good in leading a team
+you share your own ideas and opinion on a blog, on codepen.io, github or twitter</textarea>
+  </div>
+  <div class="results">
+
+  </div>
+  <div class="skalculator">
+    <h1 class="group">
+      <span id="skill-1">you are good in leading a team</span>
+    </h1>
+    <h1 class="sign">
+      ✕
+    </h1>
+    <h1>
+      <span id="skill-2">have a passion for interactive design and a healthy obsession for details</span>
+    </h1>
+    <h1 class="sign sign-equal">
+      =
+    </h1>
+    <div id="scores">
+      <input type="text" id="score" value="50">
+      <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
+    </div>
+    <div class="submit">
+      <input type="submit" id="submit" value="↵">
+    </div>
+    <p class="help">
+      Use your keyboard form 1-0 to enter a score.<br />
+      Hit ENTER to rate the next combination of skills.<br />
+      <a href="#" id="results">Show results</a>
+    </p>
+  </div>
+</body>
+</html>
