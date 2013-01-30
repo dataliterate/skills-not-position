@@ -19,17 +19,17 @@ body {
 }
 
 .centered {
-  width: 50%;
+  width: 60%;
   margin: 0 auto;
-  border-left: 1px solid RGBA(255, 255, 255, 0.1);
+  //border-left: 1px solid RGBA(255, 255, 255, 0.1);
 }
 
 header {
-  border-bottom: 2px solid #08D;
-  margin: 0 auto 40px;
-  padding: 40px 0;
+  //border-bottom: 2px solid #08D;
+  margin: 0 auto 10px;
+  padding: 60px 0 20px;
   text-align: left;
-  background-color: #CCC;
+  //background-color: #CCC;
 
   h1 {
     color: #09f;
@@ -42,77 +42,151 @@ header {
 
 .skill {
   .centered();
+
   margin-bottom: 40px;
+
+  #scores {
+    margin-top: 80px;
+    background-color: lighten(#BBB, 3%);
+    height: 140px;
+    position: relative;
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+  }
   h2 {
     color: #FFF;
     font-weight: normal;
-    font-size: 60px;
-    line-height: 80px;
+    font-size: 80px;
+    line-height: 100px;
     position: relative;
     span.quote {
+      display: none;
       position: absolute;
-      left: -120px;
-      top: -15px;
-      font-size: 160%;
+      left: -60px;
+      top: 2px;
+      font-size: 120%;
       color: #DDD;
+      font-family: Arial;
     }
   }
   p {
     font-size: 40px;
-    margin: 0;
-    padding: 0;
+    margin: 0 auto;
+    margin-left: -300px;
     position: relative;
-    line-height: 80px;
-    xlabel {
-      display: block;
-      position: absolute;
-      left: -120px;
-      top: 65px;
-      color: #DDD;
-      line-height: 80px;
-    }
+    left: 50%;
+    width: 600px;
+    padding: 0;
+    font-size: 100px;
+    //text-transform: uppercase;
+    line-height: 140px;
   }
   input[type="text"] {
     //height: 80px;
-    width: 220px;
+    width: 200px;
 
-    color: #09F;
+    color: #FFF;
     font-family: 'Helvetica Neue', Helvetica, Arial;
     font-weight: bold;
     text-align: center;
-    font-size: 120px;
-    line-height: 120px;
+    font-size: 100px;
+    line-height: 140px;
+    text-align: right;
     background: transparent;
     border: none;
-    border-bottom: 4px solid #FFF;
     
     padding: 0;
     outline: none;
   }
+  input[type="range"] {
+    //height: 80px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-apperance: none;
+    height: 140px;
+    background-color: transparent;
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      -moz-apperance: none;
+      width: 1px;
+      margin-left: 0;
+      height: 140px;
+      background-color: RGBA(255,255,255,1);
+      background-color: transparent;
+      border: none;
+      &:before {
+        content: "";
+        position: relative;
+        display: block;
+        top: 100%;
+        left: -10px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 10px 15px 10px;
+        border-color: transparent transparent #ffffff transparent;
+      }
+    }
+  }
 
   .unit {
-    font-size: 80px;
     font-weight: normal;
   }
 
   input[type="submit"] {
+    display: block;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    padding: 0 30px;
+    height: 100%;
     font-family: 'Helvetica Neue', Helvetica, Arial;
     color: #000;
     font-weight: bold;
     text-align: center;
     font-size: 40px;
-    border: 4px solid #FFF;
+    border: none;
     background-color: #FFF;
-    border-radius: 5px;
     outline: none;
   }
 
   .indicator {
-    margin: 40px 0;
-    border: 10px solid #CCC;
-    display: none;
+    position: absolute;
+    width: 100%;
+    height: 140px;
+    background-color: lighten(#09F, 10%);
+    .indicator-wrapper {
+      background-color: #09F;
+      width: 50%;
+      height: 140px;
+      -webkit-transition: width 200ms50;
+    }
   }
 
+}
+
+.result {
+  .centered();
+  h2 {
+    font-size: 60px;
+    line-height: 80px;
+    font-weight: normal;
+  }
+  .sharing {
+    margin-top: 40px;
+  }
+  button {
+    background: #FFF;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+  }
 }
 
 input.flash {
@@ -127,11 +201,20 @@ input::selection {
 }
 
 footer {
-  display: none;
   margin: 40px auto;
   width: 490px;
+  #speechinput {
+    height: 17px;
+    width: 17px;
+    width: 17px;
+    border: 1px solid #FFF;
+    border-radius: 9px;
+    -webkit-transform: scale(2);
+    color: #FFF;
+  }
 }
 kbd {
+  display: none;
   width: 30px;
   height: 30px;
   line-height: 30px;

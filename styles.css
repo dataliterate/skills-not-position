@@ -21,94 +21,159 @@ body {
   line-height: 1em;
 }
 .centered {
-  width: 50%;
+  width: 60%;
   margin: 0 auto;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 header {
-  border-bottom: 2px solid #08D;
-  margin: 0 auto 40px;
-  padding: 40px 0;
+  margin: 0 auto 10px;
+  padding: 60px 0 20px;
   text-align: left;
-  background-color: #CCC;
 }
 header h1 {
   color: #09f;
   font-weight: bold;
   font-size: 16px;
   line-height: 24px;
-  width: 50%;
+  width: 60%;
   margin: 0 auto;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 .skill {
-  width: 50%;
+  width: 60%;
   margin: 0 auto;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 40px;
+}
+.skill #scores {
+  margin-top: 80px;
+  background-color: #c3c3c3;
+  height: 140px;
+  position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .skill h2 {
   color: #FFF;
   font-weight: normal;
-  font-size: 60px;
-  line-height: 80px;
+  font-size: 80px;
+  line-height: 100px;
   position: relative;
 }
 .skill h2 span.quote {
+  display: none;
   position: absolute;
-  left: -120px;
-  top: -15px;
-  font-size: 160%;
+  left: -60px;
+  top: 2px;
+  font-size: 120%;
   color: #DDD;
+  font-family: Arial;
 }
 .skill p {
   font-size: 40px;
-  margin: 0;
-  padding: 0;
+  margin: 0 auto;
+  margin-left: -300px;
   position: relative;
-  line-height: 80px;
-}
-.skill p xlabel {
-  display: block;
-  position: absolute;
-  left: -120px;
-  top: 65px;
-  color: #DDD;
-  line-height: 80px;
+  left: 50%;
+  width: 600px;
+  padding: 0;
+  font-size: 100px;
+  line-height: 140px;
 }
 .skill input[type="text"] {
-  width: 220px;
-  color: #09F;
+  width: 200px;
+  color: #FFF;
   font-family: 'Helvetica Neue', Helvetica, Arial;
   font-weight: bold;
   text-align: center;
-  font-size: 120px;
-  line-height: 120px;
+  font-size: 100px;
+  line-height: 140px;
+  text-align: right;
   background: transparent;
   border: none;
-  border-bottom: 4px solid #FFF;
   padding: 0;
   outline: none;
 }
+.skill input[type="range"] {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  -moz-apperance: none;
+  height: 140px;
+  background-color: transparent;
+}
+.skill input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-apperance: none;
+  width: 1px;
+  margin-left: 0;
+  height: 140px;
+  background-color: #ffffff;
+  background-color: transparent;
+  border: none;
+}
+.skill input[type="range"]::-webkit-slider-thumb:before {
+  content: "";
+  position: relative;
+  display: block;
+  top: 100%;
+  left: -10px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 10px 15px 10px;
+  border-color: transparent transparent #ffffff transparent;
+}
 .skill .unit {
-  font-size: 80px;
   font-weight: normal;
 }
 .skill input[type="submit"] {
+  display: block;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  padding: 0 30px;
+  height: 100%;
   font-family: 'Helvetica Neue', Helvetica, Arial;
   color: #000;
   font-weight: bold;
   text-align: center;
   font-size: 40px;
-  border: 4px solid #FFF;
+  border: none;
   background-color: #FFF;
-  border-radius: 5px;
   outline: none;
 }
 .skill .indicator {
-  margin: 40px 0;
-  border: 10px solid #CCC;
-  display: none;
+  position: absolute;
+  width: 100%;
+  height: 140px;
+  background-color: #33adff;
+}
+.skill .indicator .indicator-wrapper {
+  background-color: #09F;
+  width: 50%;
+  height: 140px;
+  -webkit-transition: width 200ms50;
+}
+.result {
+  width: 60%;
+  margin: 0 auto;
+}
+.result h2 {
+  font-size: 60px;
+  line-height: 80px;
+  font-weight: normal;
+}
+.result .sharing {
+  margin-top: 40px;
+}
+.result button {
+  background: #FFF;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
 }
 input.flash {
   background-color: #09F;
@@ -123,11 +188,20 @@ input::selection {
   margin-top: 40px;
 }
 footer {
-  display: none;
   margin: 40px auto;
   width: 490px;
 }
+footer #speechinput {
+  height: 17px;
+  width: 17px;
+  width: 17px;
+  border: 1px solid #FFF;
+  border-radius: 9px;
+  -webkit-transform: scale(2);
+  color: #FFF;
+}
 kbd {
+  display: none;
   width: 30px;
   height: 30px;
   line-height: 30px;
