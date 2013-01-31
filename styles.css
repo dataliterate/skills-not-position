@@ -203,17 +203,17 @@ header h1 {
 #indicator ul li a,
 #indicator ul li span {
   display: block;
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  border: 1px solid #FFF;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
   overflow: hidden;
-  margin: 0 20px 0 0;
+  margin: 0 5px 0 0;
   text-indent: -80px;
+  background-color: #C7C7C7;
 }
 #indicator ul li.active a,
 #indicator ul li.active span {
-  background-color: #FFF;
+  background-color: #09F;
 }
 #indicator ul li:hover a {
   background-color: #FFF;
