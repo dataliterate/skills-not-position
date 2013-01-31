@@ -9,23 +9,52 @@
   <link rel="stylesheet" href="styles.css" type="text/css">
 <script>
 var init = function init() {
-  var SKILL_N_QUESTIONS = 2;
+  var SKILL_N_STATEMENTS = 4;
   var app = window.app = app || {};
-  var AppRouter = Backbone.Router.extend({
+  var Router = Backbone.Router.extend({
     routes:{
+      'statement/:n': 'statement',
       '': 'default'
     },
     default: function() {
-
-      app.AppSession = new app.Session();
-      app.AppSession.skills = app.AppSkills;
-      app.AppSession.words = app.AppWords;
-      app.AppMainView = new app.MainView({model: app.AppSession});
-      app.AppMainView.render();
+      console.log("s");
+      this.startSession();
+    },
+    statement: function(i) {
+      console.log("INCOMING " + i);
+      if(false && !this.hasSession()) {
+        this.navigate('');
+        return;
+      }
+      this.startSession();
+      i = parseInt(i, 10);
+      if(!_.isNumber(i) || i > app.AppSession.nStatements) {
+        console.log("..");
+        return;
+      }
+      console.log("settingPos");
+      app.AppSession.set({'skillPos': i, 'analysed': false});
+    },
+    startSession: function() {
+      if(!this.hasSession()) {
+        app.AppSession = new app.Session();
+        app.AppSession.skills = app.AppSkills;
+        app.AppSession.words = app.AppWords;
+        app.AppMainView = new app.MainView({model: app.AppSession});
+        app.AppMainView.render();
+      }
+    },
+    hasSession: function() {
+      return app.AppSession;
+    },
+    gotoNextQuestion: function() {
+      var skillPos = app.AppSession.get('skillPos');
+      console.log(skillPos);
+      this.navigate('statement/' + (skillPos + 1), {trigger: true});
     }
   });
 
-  app.Router = new AppRouter();
+  app.AppRouter = new Router();
   app.Skill = Backbone.Model.extend({
     defaults: {
       'title': '',
@@ -66,9 +95,9 @@ var init = function init() {
     },
     words: null,
     skills: null,
-    length: SKILL_N_QUESTIONS,
+    nStatements: SKILL_N_STATEMENTS,
     hasNext: function() {
-      if(this.get('skillPos') + 1 < this.length) {
+      if(this.get('skillPos') + 1 < this.nStatements) {
         return true;
       }
       return false;
@@ -226,37 +255,26 @@ var init = function init() {
       console.log(e);
     }
   });
-  app.MainView = Backbone.View.extend({
-    el: '#app',
-    appTemplate: _.template($('#app-tmpl').html()),
-    resultTemplate: _.template($('#result-tmpl').html()),
-    /*
-    events: {
-      'keypress #app': 'onKeyDown'
-    },
-    */
-    skillView: null,
+  app.InputElement = Backbone.View.extend({
+    $el: null,
+    template: _.template($('#input-element-tmpl').html()),
+    value: 0,
     initialize: function() {
-      this.$el = $(this.el);
+      this.render();
+    },
+    render: function() {
+      this.$el = $('<div id="skill-input"></div>');
 
-      this.listenTo(this.model, 'change:skillPos', this.skillChange);
+      this.$el.html(this.template());
+      this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
+      console.log(this.$el);
+
       $('body').keydown(_.bind(this.onKeyDown, this));
       
-      
     },
-
-    render: function() {
-      this.$el.html(this.appTemplate());
-
-      $('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
-
-      this.skillChange();
-      //this.setupView();
-    },
-    eventLog: {},
     onSpeechChange: function(e) {
       if(['weiter', 'enter'].indexOf($(e.currentTarget).val()) !== -1) {
-        this.submitScore();
+        this.trigger('submit');
         return;
       }
       var num = null;
@@ -265,16 +283,23 @@ var init = function init() {
       } else {
         num = parseInt($(e.currentTarget).val(), 10);
       }
-      console.log(num);
       if(!isNaN(num)) {
-        this.changeScore(num);
+        this.trigger('change', num);
         $('#speechinput').blur();
       }
+    },
+    eventLog: {},
+    waitingForCompletion: 0,
+    waitingForCompletionTimer: null,
+    stopWaitingForCompletion: function() {
+      window.clearTimeout(this.waitingForCompletionTimer);
+      this.waitingForCompletion = 0;
+      this.displayNumber();
     },
     onKeyDown: function(e) {
       var ENTER_KEY = 13;
       if(e.keyCode == ENTER_KEY) {
-        this.submitScore();
+        this.trigger('submit');
         return;
       }
 
@@ -310,18 +335,86 @@ var init = function init() {
       }
       var score = num;
       // photoshop opacity layer style input
-      if("lastEvent" in this.eventLog && e.timeStamp - this.eventLog.lastEvent.timeStamp < 250) {
-        num = this.eventLog.lastNum.toString() + num.toString();
-        this.eventLog.lastNum = num;
+      if(this.waitingForCompletion) {
+        if(this.value == 10 && this.waitingForCompletion == 2) {
+          num = 100;
+        } else {
+          num = this.value + num;
+        }
+        if(num == 10) {
+          console.log("WON HUNDETEDT");
+          this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
+          this.waitingForCompletion = 2;
+          this.displayNumber();
+        } else {
+          this.stopWaitingForCompletion();
+        }
       } else {
-        this.eventLog.lastNum = num;
         num = num * 10;
+        this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
+        this.waitingForCompletion = 1;
       }
-      this.eventLog.lastEvent = e;
-      
 
-      this.changeScore(num);
+      this.trigger('change', num);
     },
+    manipulateScore: function(score) {
+      var currentScore = this.value;
+      var newScore = currentScore + score;
+      this.trigger('change', newScore);
+    },
+    displayNumber: function() {
+      var h = '';
+      console.log("DSIPLAYING NUMBER ", this.waitingForCompletion);
+      if(this.waitingForCompletion == 1) {
+        if(this.value == 0) {
+          // special: change first char
+          h += '<span class="changeable">' + String(this.value)[0] + '</span>';
+        } else {
+          h += String(this.value)[0];
+          h += '<span class="changeable">' + String(this.value)[1] + '</span>';
+        }
+      } else if(this.waitingForCompletion == 2) {
+        // special: allow hundred
+        console.log("CARET");
+        h += '10<span class="changeable">&nbsp;</span>';
+      } else {
+        h += String(this.value);
+      }
+      this.$el.find('#score').html(h);
+    },
+    set: function(v) {
+      console.log("InputElement: " + v);
+      this.value = v;
+      this.displayNumber();
+    }
+  });
+  app.MainView = Backbone.View.extend({
+    el: '#app',
+    appTemplate: _.template($('#app-tmpl').html()),
+    resultTemplate: _.template($('#result-tmpl').html()),
+    /*
+    events: {
+      'keypress #app': 'onKeyDown'
+    },
+    */
+    skillView: null,
+    inputElement: null,
+    initialize: function() {
+      this.$el = $(this.el);
+      this.inputElement = new app.InputElement;
+
+      this.listenTo(this.inputElement, 'submit', this.submitScore);
+      this.listenTo(this.inputElement, 'change', this.changeScore);
+      this.listenTo(this.model, 'change:skillPos', this.skillChange);
+      
+    },
+
+    render: function() {
+      this.$el.html(this.appTemplate());
+      this.skillChange();
+      //this.setupView();
+    },
+    eventLog: {},
     changeScore: function(score) {
       if(score > 100) {
         score = 100;
@@ -347,15 +440,33 @@ var init = function init() {
         this.showPosition();
         return;
       }
-      this.model.next();
+      var pos = this.model.get('skillPos');
+      app.AppRouter.gotoNextQuestion();
+      //this.model.next();
+    },
+    onScoreChange: function() {
+      var score = app.AppSkills.currentSkill().get('score');
+      this.inputElement.set(score);
     },
     skillChange: function() {
+      var currentSkill = app.AppSkills.currentSkill();
+      this.listenTo(currentSkill, 'change:score', this.onScoreChange);
       this.skillView = new app.SkillView({model: app.AppSkills.currentSkill()});
       this.skillView.$el = this.$el.find('#skill');
       this.skillView.render();
+      this.skillView.appendInput(this.inputElement.$el);
+      console.log(this.inputElement.$el);
+
       this.$el.find('#scorer').change(_.bind(this.changeRange, this));
       this.$el.find('#submit').click(_.bind(this.submitScore, this));
-      app.AppSkills.currentSkill().set({score: 50});
+
+      // strange, default value sometimes is undefined: quick fix:
+      var score = app.AppSkills.currentSkill().get('score');
+      if(!score) {
+        app.AppSkills.currentSkill().set({'score': 50});
+      } else {
+        app.AppSkills.currentSkill().trigger('change:score');
+      }
     },
     changeRange: function(e) {
       var x = $(e.currentTarget).val();
@@ -473,13 +584,17 @@ var init = function init() {
     },
     updateScore: function() {
       var score = this.model.get('score');
-      this.$el.find('#score').val(score);
+      //this.$el.find('#score').val(score);
       this.$el.find('#scorer').val(score);
       this.$el.find('.indicator-wrapper').css('width', score + '%');
       //var style = $('<style>#scorer::-webkit-slider-thumb { width: ' + score + '%; margin-left: ' + (- score / 2 - score / 4 - score / 8) + '% }</style>');
       //$('#xtrastyle').remove();
-      
+    },
+    appendInput: function($el) {
+
+      this.$el.find('.skill').append($el);
     }
+
   });
 
   /**
@@ -527,7 +642,7 @@ var init = function init() {
       console.log("GROUP");
       var sortedWords = _.sortBy(words, function(word) {
         //return -1 * (word.get('score') / word.get('n'));
-        var orderScore = (word.get('score') / SKILL_N_QUESTIONS);
+        var orderScore = (word.get('score') / SKILL_N_STATEMENTS);
         //orderScore = word.get('score');
         console.log(word.get('title') + ' ' + orderScore + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
         word.set({orderScore: orderScore});
@@ -761,7 +876,6 @@ $(init);
 
   </div>
   <footer>
-    <input id="speechinput" type="text" x-webkit-speech speech />
     <div class="keyboard">
       <div class="first-row">
         <kbd>1</kbd>
@@ -808,14 +922,17 @@ $(init);
 <script type="text/template" id="skill-tmpl">
 <div class="skill">
 <h2><span class="quote">&raquo; </span><%= title %></h2>
-      <div id="scores">
-        <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
-        <p>
-          <input type="text" id="score" value="50"><span class="unit">%</span> true
-        </p>
-        <input type="submit" id="submit" value="↵">
-        <input type="range" id="scorer" value="50" />
-      </div>
+</div>
+</script>
+<script type="text/template" id="input-element-tmpl">
+<div id="scores">
+  <input id="speechinput" type="text" x-webkit-speech speech>
+  <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
+  <p>
+    <strong id="score"><span class="changeable">50</span></strong><span class="unit">%</span> true
+  </p>
+  <input type="submit" id="submit" value="↵">
+  <input type="range" id="scorer" value="50">
 </div>
 </script>
 <script type="text/template" id="setup-tmpl">

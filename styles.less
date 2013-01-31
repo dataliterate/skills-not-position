@@ -40,6 +40,11 @@ header {
   }
 }
 
+@-webkit-keyframes blinker {  
+  from { border-color: #FFF; }
+  to { border-color: transparent; }
+}
+
 .skill {
   .centered();
 
@@ -85,7 +90,7 @@ user-select: none;
     //text-transform: uppercase;
     line-height: 140px;
   }
-  input[type="text"] {
+  strong {
     //height: 80px;
     width: 200px;
 
@@ -101,6 +106,15 @@ user-select: none;
     
     padding: 0;
     outline: none;
+
+    .changeable {
+      border-bottom: 3px dotted #FFF;
+      background-color: RGBA(0, 0, 0, 0.2);
+      -webkit-animation-name: blinker;
+      -webkit-animation-iteration-count: 3;
+      -webkit-animation-duration: 450ms;
+      -webkit-animation-timing-function: cubic-bezier(1.0,0,0,1.0);
+    }
   }
   input[type="range"] {
     //height: 80px;
@@ -200,18 +214,22 @@ input::selection {
   margin-top: 40px;
 }
 
+#speechinput {
+  position: absolute;
+  left: -40px;
+  height: 17px;
+  width: 17px;
+  width: 17px;
+  border: 1px solid #FFF;
+  border-radius: 9px;
+  -webkit-transform: scale(2);
+  color: #FFF;
+}
+
 footer {
   margin: 40px auto;
   width: 490px;
-  #speechinput {
-    height: 17px;
-    width: 17px;
-    width: 17px;
-    border: 1px solid #FFF;
-    border-radius: 9px;
-    -webkit-transform: scale(2);
-    color: #FFF;
-  }
+
 }
 kbd {
   display: none;
