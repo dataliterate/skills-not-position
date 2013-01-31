@@ -203,6 +203,36 @@ user-select: none;
   }
 }
 
+#indicator {
+  width: 50%;
+  float: right;
+  top: -40px;
+  position: relative;
+  ul {
+    li {
+      display: inline-block;
+      a, span {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        border: 1px solid #FFF;
+        overflow: hidden;
+        margin: 0 20px 0 0;
+        text-indent: -80px;
+      }
+      &.active a,
+      &.active span {
+        background-color: #FFF;
+      }
+      &:hover a {
+        background-color: #FFF;
+      }
+    }
+  }
+
+}
+
 input.flash {
   background-color: #09F;
   -webkit-transition: background-color 0 linear;
@@ -322,19 +352,6 @@ label {
   float: left;
   width: 50%;
   height: 250px;
-}
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-li {
-  display: block;
-  width: 100%;
-  margin: 40px 0;
-  padding-bottom: 40px;
-  border-bottom: 5px solid #CCC;
-  float: left;
 }
 #setup {
   display: none;

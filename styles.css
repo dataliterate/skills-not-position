@@ -191,6 +191,33 @@ header h1 {
   border-radius: 5px;
   padding: 10px 20px;
 }
+#indicator {
+  width: 50%;
+  float: right;
+  top: -40px;
+  position: relative;
+}
+#indicator ul li {
+  display: inline-block;
+}
+#indicator ul li a,
+#indicator ul li span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid #FFF;
+  overflow: hidden;
+  margin: 0 20px 0 0;
+  text-indent: -80px;
+}
+#indicator ul li.active a,
+#indicator ul li.active span {
+  background-color: #FFF;
+}
+#indicator ul li:hover a {
+  background-color: #FFF;
+}
 input.flash {
   background-color: #09F;
   -webkit-transition: background-color 0 linear;
@@ -308,19 +335,6 @@ label {
   float: left;
   width: 50%;
   height: 250px;
-}
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-li {
-  display: block;
-  width: 100%;
-  margin: 40px 0;
-  padding-bottom: 40px;
-  border-bottom: 5px solid #CCC;
-  float: left;
 }
 #setup {
   display: none;

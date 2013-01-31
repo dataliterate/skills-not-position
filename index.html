@@ -9,31 +9,36 @@
   <link rel="stylesheet" href="styles.css" type="text/css">
 <script>
 var init = function init() {
-  var SKILL_N_STATEMENTS = 4;
+  var SKILL_N_STATEMENTS = 3;
   var app = window.app = app || {};
   var Router = Backbone.Router.extend({
     routes:{
       'statement/:n': 'statement',
+      'position': 'position',
       '': 'default'
     },
     default: function() {
-      console.log("s");
       this.startSession();
     },
     statement: function(i) {
-      console.log("INCOMING " + i);
       if(false && !this.hasSession()) {
         this.navigate('');
         return;
       }
       this.startSession();
-      i = parseInt(i, 10);
+      i = parseInt(i, 10) - 1;
       if(!_.isNumber(i) || i > app.AppSession.nStatements) {
-        console.log("..");
         return;
       }
-      console.log("settingPos");
       app.AppSession.set({'skillPos': i, 'analysed': false});
+    },
+    position: function() {
+      if(false && !this.hasSession()) {
+        this.navigate('');
+        return;
+      }
+      this.startSession();
+      app.AppMainView.showPosition();
     },
     startSession: function() {
       if(!this.hasSession()) {
@@ -49,8 +54,10 @@ var init = function init() {
     },
     gotoNextQuestion: function() {
       var skillPos = app.AppSession.get('skillPos');
-      console.log(skillPos);
-      this.navigate('statement/' + (skillPos + 1), {trigger: true});
+      this.navigate('statement/' + (skillPos + 2), {trigger: true});
+    },
+    gotoPosition: function() {
+      this.navigate('position', {trigger: true});
     }
   });
 
@@ -399,10 +406,11 @@ var init = function init() {
     */
     skillView: null,
     inputElement: null,
+    indicatorView: null,
     initialize: function() {
       this.$el = $(this.el);
       this.inputElement = new app.InputElement;
-
+      this.indicatorView = new app.IndicatorView({model: this.model});
       this.listenTo(this.inputElement, 'submit', this.submitScore);
       this.listenTo(this.inputElement, 'change', this.changeScore);
       this.listenTo(this.model, 'change:skillPos', this.skillChange);
@@ -412,6 +420,8 @@ var init = function init() {
     render: function() {
       this.$el.html(this.appTemplate());
       this.skillChange();
+      this.indicatorView.$el = $('#indicator');
+      this.indicatorView.render();
       //this.setupView();
     },
     eventLog: {},
@@ -437,7 +447,7 @@ var init = function init() {
       console.log(app.AppSkills.currentSkill());
 
       if(!this.model.hasNext()) {
-        this.showPosition();
+        app.AppRouter.gotoPosition();
         return;
       }
       var pos = this.model.get('skillPos');
@@ -449,6 +459,8 @@ var init = function init() {
       this.inputElement.set(score);
     },
     skillChange: function() {
+      $('body').removeClass('position');
+
       var currentSkill = app.AppSkills.currentSkill();
       this.listenTo(currentSkill, 'change:score', this.onScoreChange);
       this.skillView = new app.SkillView({model: app.AppSkills.currentSkill()});
@@ -475,7 +487,6 @@ var init = function init() {
     showPosition: function() {
       var position = this.model.getPosition();
       $('body').addClass('position');
-      $('footer').hide();
       $('header h1').html('Your position at precious:');
       var html = this.resultTemplate({position: position});
       this.$el.find('#skill').html(html);
@@ -591,10 +602,42 @@ var init = function init() {
       //$('#xtrastyle').remove();
     },
     appendInput: function($el) {
-
       this.$el.find('.skill').append($el);
     }
+  });
+  app.IndicatorView = Backbone.View.extend({
+    //template: _.template($('#skill-tmpl').html()),
+    initialize: function() {
+      this.listenTo(this.model, "change:skillPos", this.onSkillPosChanged);
+    },
+    render: function() {
+      var h = '<ul>';
+      var currentPos = this.model.get('skillPos');
+      for(var i = 0; i < this.model.nStatements; i++) {
+        if(i == currentPos) {
+          h += '<li class="active"><span href="#" data-target="' + (i + 1) + '">' + (i + 1) + '</span></li>';
+        } else if(this.model.skills.at(i).get('completed')) {
+          h += '<li><a href="#statement/' + (i + 1) + '" data-target="' + (i + 1) + '">' + (i + 1) + '</a></li>';
+        } else {
+          h += '<li><span>' + (i + 1) + '</span></li>';
+        }
+        
+      }
+      h += '</ul>';
+      this.$el.html(h);
+      this.$el.find('a').click(_.bind(this.gotoPos, this));
+    },
+    onSkillPosChanged: function() {
+      this.render();
+    },
+    skillPos: function() {
+      var i = this.model.get('skillPos');
+      this.$el.find('li').get(i).removeClass();
+      this.$el.find('li').get(i).addClass('active');
+    },
+    gotoPos: function() {
 
+    }
   });
 
   /**
@@ -869,6 +912,9 @@ $(init);
   <header>
     <h1 class="centered">Rate the following statement</h1>
   </header>
+  <div id="indicator">
+
+  </div>
   <div id="skill">
 
   </div>
