@@ -1,0 +1,46 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Design Position Generator</title>
+  <script src="jquery.min.js"></script>
+  <script src="underscore.js"></script>
+  <script src="backbone.js"></script>
+  <script src="keyboard.js"></script>
+  <link rel="stylesheet" href="styles.css" type="text/css">
+<script>
+
+$(document).ready(function() {
+  var aCtx;
+  var analyser;
+  window.x = analyser;
+  var microphone;
+  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  console.log(navigator.getUserMedia);
+  if (navigator.getUserMedia) {
+      navigator.getUserMedia({audio: true}, function(stream) {
+        console.log(stream);
+          aCtx = new webkitAudioContext();
+          analyser = aCtx.createAnalyser();
+          microphone = aCtx.createMediaStreamSource(stream);
+          microphone.connect(analyser);
+          analyser.connect(aCtx.destination);
+          process();
+      }, function error() {console.log("error")});
+  };
+  function process(){
+      setInterval(function(){
+          FFTData = new Float32Array(analyser.frequencyBinCount);
+          analyser.getFloatFrequencyData(FFTData);
+          console.log(analyser);
+      }, 500);
+  }
+
+});
+</script>
+<body>
+<div id="app">
+
+</div>
+
+</body>
+</html>

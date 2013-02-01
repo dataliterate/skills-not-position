@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="29px" height="55px" viewBox="0 0 29 55" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <title>arrow slim</title>
+    <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
+    <defs></defs>
+    <g id="Page 1" fill="rgb(206,206,206)" fill-rule="evenodd">
+        <g id="arrow" fill="rgb(0,0,0)">
+            <path d="M4.83091684,55 C3.90412515,55 2.9712918,54.7068617 2.1913127,54.1024468 C0.367333502,52.6894149 0.0718960961,50.1120212 1.5309585,48.3455852 L18.7509162,27.5 L1.53095857,6.65441498 C0.0718960961,4.88797878 0.367937768,2.31058532 2.19131277,0.897553424 C4.01589609,-0.514893405 6.67664598,-0.228776336 8.13570845,1.53707473 L27.4690418,24.9413301 C28.7051668,26.437447 28.7051668,28.5625535 27.4690418,30.0586706 L8.13570845,53.462926 C7.30074978,54.4739881 6.0712707,55 4.83091684,55 L4.83091684,55 Z M4.83091684,55" id="Shape"></path>
+        </g>
+    </g>
+</svg>
