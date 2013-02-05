@@ -16,7 +16,12 @@ module.exports = InputElement = Backbone.View.extend({
       //this.$el = $('<div id="skill-input"></div>');
 
       this.$el.html(this.template());
-      this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
+
+      if(!Modernizr.inputspeech) {
+        $('#speechinput').hide();
+      } else {
+        this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
+      }
 
       this.$el.find('#scorer').change(_.bind(this.onRangeChange, this));
       this.$el.find('#submit').click(_.bind(this.onSubmit, this));

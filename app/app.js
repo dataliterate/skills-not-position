@@ -20,5 +20,14 @@ _.extend(App.prototype, {
 });
 
 $(function() {
+
+  Modernizr.addTest('inputspeech', function() {
+      return !(document.createElement("input").webkitSpeech === undefined)
+  });
+  Modernizr.addTest('svganchors', function() {
+    // cheating:
+    return !(/WebKit/.test(navigator.userAgent))
+  });
+
   window.PositionFinder = module.exports = new App();
 });

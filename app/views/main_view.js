@@ -37,8 +37,27 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.$el = $('#input');
       this.inputElement.render();
 
-      $('#input-keyboard').mouseup(function() {
-        $('#ios-keyboard').focus();
+      if(!Modernizr.svganchors) {
+        $('img.svg').fixSVGStack();
+      }
+      if(Modernizr.touch) {
+        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
+        $('#input-keyboard').mouseup(function() {
+          $('#ios-keyboard').focus();
+        });
+      } else {
+        $('.input-options img').tipsy({gravity: 's'});
+      }
+      // feature detection:
+      var inputOptions = {
+        'mic': Modernizr.inputspeech,
+        'mouse': !Modernizr.touch,
+        'touch': Modernizr.touch
+      }
+      _.each(inputOptions, function(enabled, inputOption) {
+        if(!enabled) {
+          $('img#input-' + inputOption).addClass('disabled');
+        }
       });
       //this.setupView();
     },
