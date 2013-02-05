@@ -2,18 +2,9 @@
 <head>
   <meta charset="utf-8">
   <title>Design Position Generator</title>
-  <script src="app.js"></script>
-  <script src="lib.js"></script>
-  <script>
-    Modernizr.addTest('inputspeech', function() {
-      return !(document.createElement("input").webkitSpeech === undefined)
-    });
-    Modernizr.addTest('svganchors', function() {
-      // cheating:
-      return !(/WebKit/.test(navigator.userAgent))
-    });
-  </script>
-  <link rel="stylesheet" href="styles.css" type="text/css">
+  
+  <script src="position-finder.min.js"></script>
+  <link rel="stylesheet" href="styles.min.css" type="text/css">
 </head>
 <body>
 <div id="app">

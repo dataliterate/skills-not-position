@@ -13709,15 +13709,15 @@ var Router = Backbone.Router.extend({
   routes:{
     'statement/:n': 'statement',
     'position': 'position',
-    '': 'default'
+    '': 'defaultRoute'
   },
   session: null,
   mainView: null,
-  default: function() {
+  defaultRoute: function() {
     this.startSession();
   },
   statement: function(i) {
-    if(false && !this.hasSession()) {
+    if(!this.hasSession()) {
       this.navigate('');
       return;
     }
@@ -13729,7 +13729,7 @@ var Router = Backbone.Router.extend({
     this.session.set({'skillPos': i, 'analysed': false});
   },
   position: function() {
-    if(false && !this.hasSession()) {
+    if(!this.hasSession()) {
       this.navigate('');
       return;
     }
@@ -13767,7 +13767,7 @@ require.define("/app/settings.js",function(require,module,exports,__dirname,__fi
 
 var Settings = function() {
   this.initialize.apply(this, arguments);
-}
+};
 
 _.extend(Settings.prototype, {
   N_STATEMENTS: 4,
@@ -13785,6 +13785,8 @@ require.define("/app/models/session.js",function(require,module,exports,__dirnam
   , Settings = require('../settings')
   , AppWords = require('../collections/app_words')
   , AppSkills = require('../collections/app_skills')
+
+  , Session
   ;
 
 module.exports = Session = Backbone.Model.extend({
@@ -13826,12 +13828,10 @@ module.exports = Session = Backbone.Model.extend({
 
       // getting range
       this.skills.each(function(skill) {
-        console.log(skill);
         if(!skill.get('completed')) {
           return;
         }
         var score = skill.get('score');
-        console.log(" X X X");
         min = Math.min(min, score);
         max = Math.max(max, score);
         sum += score;
@@ -13840,6 +13840,7 @@ module.exports = Session = Backbone.Model.extend({
 
       avg = sum / n;
       absoluteAvg = (avg - min) / (max - min) * 100;
+      /*
       console.log("\n");
       console.log("\n");
       console.log("--- - ----- ---- - - --- - ----- -- ");
@@ -13850,14 +13851,14 @@ module.exports = Session = Backbone.Model.extend({
       console.log("--- - ----- ---- - - --- - ----- -- ");
       console.log("\n");
       console.log("\n");
-
-      if(min == max && avg == 50) {
+      */
+      if(min === max && avg === 50) {
         exception = 'avg';
       }
-      if(min == max && avg == 100) {
+      if(min === max && avg === 100) {
         exception = '100';
       }
-      if(min == max && avg == 0) {
+      if(min === max && avg === 0) {
         exception = '0';
       }
 
@@ -13869,14 +13870,8 @@ module.exports = Session = Backbone.Model.extend({
         if(_.isUndefined(userScore)) {
           userScore = 0;
         }
-        console.log("\n");
-        console.log(skill.get('title'));
-        console.log(userScore);
 
         var absoluteScore = (userScore - min) / (max - min) * 100;
-        console.log(absoluteScore);
-
-        console.log(absoluteScore - absoluteAvg);
 
         var score = absoluteScore - absoluteAvg;
         userScore -= 40;
@@ -13906,12 +13901,14 @@ module.exports = Session = Backbone.Model.extend({
       
       var words = AppWords.getWordsInGroup(group);
       grouped[group] = words;
-      var min = _.min(words, function(w) { return w.get('orderScore')});
-      var max = _.max(words, function(w) { return w.get('orderScore')});
+      var min = _.min(words, function(w) { return w.get('orderScore');});
+      var max = _.max(words, function(w) { return w.get('orderScore');});
+      /*
       console.log("\n");
       console.log("\n");
       console.log(group);
       console.log(min.get('orderScore') + " " + max.get('orderScore') + " " + Math.abs(max.get('orderScore') - min.get('orderScore')));
+      */
       groupRanges[group] = {min: min.get('orderScore'), max: max.get('orderScore'), range: Math.abs(max.get('orderScore') - min.get('orderScore'))};
       
     });
@@ -13921,16 +13918,16 @@ module.exports = Session = Backbone.Model.extend({
     --
     Attitude [, Attitude] Level Field [Field] [Title] Designer
     */
-    var title = grouped['attitude'][0].get('title');
-    if(grouped['attitude'][0].get('orderScore') - grouped['attitude'][1].get('orderScore') < groupRanges['attitude'].range / 10) {
-      title += ', ' + grouped['attitude'][1].get('title');
+    var title = grouped.attitude[0].get('title');
+    if(grouped.attitude[0].get('orderScore') - grouped.attitude[1].get('orderScore') < groupRanges.attitude.range / 10) {
+      title += ', ' + grouped.attitude[1].get('title');
     }
-    title += ' ' + _.first(grouped['level']).get('title');
-    title += ' ' + grouped['field'][0].get('title');
-    if(grouped['field'][0].get('orderScore') - grouped['field'][1].get('orderScore') < groupRanges['field'].range / 10) {
-      title += ' & ' + grouped['field'][1].get('title');
+    title += ' ' + _.first(grouped.level).get('title');
+    title += ' ' + grouped.field[0].get('title');
+    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 10) {
+      title += ' & ' + grouped.field[1].get('title');
     }
-    title += ' ' + _.first(grouped['title']).get('title');
+    title += ' ' + _.first(grouped.title).get('title');
     return title;
 
   }
@@ -13951,7 +13948,7 @@ var Words = Backbone.Collection.extend({
   },
   getByTitle: function(title) {
     return this.filter(function(model) {
-      return (model.get('title').toLowerCase() == title.toLowerCase());
+      return (model.get('title').toLowerCase() === title.toLowerCase());
     });
   },
   getWordsByGroup: function() {
@@ -13960,25 +13957,22 @@ var Words = Backbone.Collection.extend({
     });
   },
   getGroups: function() {
-    return _.map(this.getWordsByGroup(), function(x, k) {return k});
+    return _.map(this.getWordsByGroup(), function(x, k) {return k;});
   },
   getWordsInGroup: function(group) {
     var words = this.getWordsByGroup()[group];
-    console.log("GROUP");
     var sortedWords = _.sortBy(words, function(word) {
       //return -1 * (word.get('score') / word.get('n'));
-      var orderScore = (word.get('score') / Settings.N_STATEMENTS);
+      //var orderScore = (word.get('score') / Settings.N_STATEMENTS);
       var orderScore = (word.get('score') / word.get('n'));
-      if(word.get('n') == 0) {
+      if(word.get('n') === 0) {
         orderScore = -1000;
       }
       
-      //orderScore = word.get('score');
-      console.log(word.get('title') + ' ' + orderScore + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
+      //console.log(word.get('title') + ' ' + orderScore + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
       word.set({orderScore: orderScore});
       return -1 * orderScore;
     });
-    console.log(sortedWords);
     return sortedWords;
   }
 });
@@ -13996,16 +13990,18 @@ Field:
 Title:
   Architect, Evanglist
 */
-AppWords.addWordsToGroup('Enthusiastic, Motivated, Open-minded, Critical, Innovative, Reflecting, Technology-Loving'.split(', '), 'attitude');
-AppWords.addWordsToGroup('Senior-level, Experienced, Lead, Head of'.split(', '), 'level');
-AppWords.addWordsToGroup('UX, UI, IxD, Visual, Frontend, Digital Product, Multiscreen'.split(', '), 'field');
-AppWords.addWordsToGroup('Design Architect, Design Evanglist, Designer, Creative Coder, Design Engineer'.split(', '), 'title');
+AppWords.addWordsToGroup(['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Reflecting', 'Technology-Loving'], 'attitude');
+AppWords.addWordsToGroup(['Senior-level', 'Experienced', 'Lead', 'Head of'], 'level');
+AppWords.addWordsToGroup(['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Digital Product', 'Multiscreen'], 'field');
+AppWords.addWordsToGroup(['Design Architect', 'Design Evanglist', 'Designer', 'Creative Coder', 'Design Engineer'], 'title');
 
 module.exports = AppWords;
 });
 
 require.define("/app/models/word.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
+
+  , Word
   ;
 
 module.exports = Word = Backbone.Model.extend({
@@ -14244,6 +14240,8 @@ require.define("/app/views/main_view.js",function(require,module,exports,__dirna
   , IndicatorView = require('./indicator_view')
   , SkillView = require('./skill_view')
   , SetupView = require('./setup_view')
+
+  , MainView
   ;
 
 module.exports = MainView = Backbone.View.extend({
@@ -14260,7 +14258,7 @@ module.exports = MainView = Backbone.View.extend({
     indicatorView: null,
     initialize: function() {
       this.$el = $(this.el);
-      this.inputElement = new InputElement;
+      this.inputElement = new InputElement();
       this.indicatorView = new IndicatorView({model: this.model});
       this.listenTo(this.inputElement, 'submit', this.submitScore);
       this.listenTo(this.inputElement, 'change', this.changeScore);
@@ -14276,8 +14274,27 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.$el = $('#input');
       this.inputElement.render();
 
-      $('#input-keyboard').mouseup(function() {
-        $('#ios-keyboard').focus();
+      if(!Modernizr.svganchors) {
+        $('img.svg').fixSVGStack();
+      }
+      if(Modernizr.touch) {
+        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
+        $('#input-keyboard').mouseup(function() {
+          $('#ios-keyboard').focus();
+        });
+      } else {
+        $('.input-options img').tipsy({gravity: 's'});
+      }
+      // feature detection:
+      var inputOptions = {
+        'mic': Modernizr.inputspeech,
+        'mouse': !Modernizr.touch,
+        'touch': Modernizr.touch
+      };
+      _.each(inputOptions, function(enabled, inputOption) {
+        if(!enabled) {
+          $('img#input-' + inputOption).addClass('disabled');
+        }
       });
       //this.setupView();
     },
@@ -14301,7 +14318,6 @@ module.exports = MainView = Backbone.View.extend({
     submitScore: function() {
       //if last skill saved
       this.model.currentSkill().set({completed: true});
-      console.log(this.model.currentSkill());
 
       if(!this.model.hasNext()) {
         this.router.gotoPosition();
@@ -14349,14 +14365,14 @@ module.exports = MainView = Backbone.View.extend({
 
         var text = "My #designposition: " + position;
         text += " http://bit.ly/design-positions";
-        var url = "https://twitter.com/intent/tweet?text=" + escape(text);
+        var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
         window.location.href = url;
         
       });
 
       $('button.facebook').click(function(e) {
         var text = "My #designposition: " + position;
-        var url = "http://www.facebook.com/sharer/sharer.php?u=" + escape('http://bit.ly/design-positions') + "&t=" + escape(text);
+        var url = "http://www.facebook.com/sharer/sharer.php?u=" + window.escape('http://bit.ly/design-positions') + "&t=" + window.escape(text);
         window.location.href = url;
       });
     },
@@ -14370,7 +14386,6 @@ module.exports = MainView = Backbone.View.extend({
       }
     },
     statementLayout: function() {
-      console.log("))");
       $('body').removeClass('position');
       $('header h1').html('Rate this statement');
       if(!Modernizr.svganchors) {
@@ -14388,6 +14403,7 @@ module.exports = MainView = Backbone.View.extend({
 require.define("/app/views/input_element.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , InputElement
   ;
 
 module.exports = InputElement = Backbone.View.extend({
@@ -14403,7 +14419,12 @@ module.exports = InputElement = Backbone.View.extend({
       //this.$el = $('<div id="skill-input"></div>');
 
       this.$el.html(this.template());
-      this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
+
+      if(!Modernizr.inputspeech) {
+        $('#speechinput').hide();
+      } else {
+        this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
+      }
 
       this.$el.find('#scorer').change(_.bind(this.onRangeChange, this));
       this.$el.find('#submit').click(_.bind(this.onSubmit, this));
@@ -14455,7 +14476,7 @@ module.exports = InputElement = Backbone.View.extend({
     },
     onKeyDown: function(e) {
       var ENTER_KEY = 13;
-      if(e.keyCode == ENTER_KEY) {
+      if(e.keyCode === ENTER_KEY) {
         this.trigger('submit');
         return;
       }
@@ -14483,9 +14504,9 @@ module.exports = InputElement = Backbone.View.extend({
       // numeric input
       var num = null;
       if(!isNaN(String.fromCharCode(e.keyCode))) {
-        num = parseInt(String.fromCharCode(e.keyCode));
+        num = parseInt(String.fromCharCode(e.keyCode), 10);
       } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
-        num = parseInt(String.fromCharCode(e.keyCode - 48));
+        num = parseInt(String.fromCharCode(e.keyCode - 48), 10);
       }
       if(num === null) {
         return;
@@ -14493,13 +14514,12 @@ module.exports = InputElement = Backbone.View.extend({
       var score = num;
       // photoshop opacity layer style input
       if(this.waitingForCompletion) {
-        if(this.value == 10 && this.waitingForCompletion == 2) {
+        if(this.value === 10 && this.waitingForCompletion === 2) {
           num = 100;
         } else {
           num = this.value + num;
         }
-        if(num == 10) {
-          console.log("WON HUNDETEDT");
+        if(num === 10) {
           this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
           this.waitingForCompletion = 2;
           this.displayNumber();
@@ -14521,15 +14541,15 @@ module.exports = InputElement = Backbone.View.extend({
     },
     displayNumber: function() {
       var h = '';
-      if(this.waitingForCompletion == 1) {
-        if(this.value == 0) {
+      if(this.waitingForCompletion === 1) {
+        if(this.value === 0) {
           // special: change first char
           h += '<span class="changeable">' + String(this.value)[0] + '</span>';
         } else {
           h += String(this.value)[0];
           h += '<span class="changeable">' + String(this.value)[1] + '</span>';
         }
-      } else if(this.waitingForCompletion == 2) {
+      } else if(this.waitingForCompletion === 2) {
         // special: allow hundred
         h += '10<span class="changeable">&nbsp;</span>';
       } else {
@@ -14549,17 +14569,19 @@ module.exports = InputElement = Backbone.View.extend({
 require.define("/app/views/indicator_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , IndicatorView
   ;
 
-module.exports = IndicatorView = Backbone.View.extend({
+IndicatorView = module.exports = Backbone.View.extend({
   initialize: function() {
     this.listenTo(this.model, "change:skillPos", this.onSkillPosChanged);
   },
   render: function() {
     var h = '<ul>';
     var currentPos = this.model.get('skillPos');
-    for(var i = 0; i < this.model.nStatements; i++) {
-      if(i == currentPos) {
+    var i;
+    for(i = 0; i < this.model.nStatements; i++) {
+      if(i === currentPos) {
         h += '<li class="active"><span href="#" data-target="' + (i + 1) + '">' + (i + 1) + '</span></li>';
       } else if(this.model.skills.at(i).get('completed')) {
         h += '<li><a href="#statement/' + (i + 1) + '" data-target="' + (i + 1) + '">' + (i + 1) + '</a></li>';
@@ -14589,6 +14611,8 @@ module.exports = IndicatorView = Backbone.View.extend({
 require.define("/app/views/skill_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+
+  , SkillView
   ;
 
 module.exports = SkillView = Backbone.View.extend({
@@ -14602,6 +14626,8 @@ module.exports = SkillView = Backbone.View.extend({
 require.define("/app/views/setup_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , SetupSkillView// = require('setupskill_view')
+  , SetupView
   ;
 
 module.exports = SetupView = Backbone.View.extend({
@@ -14613,9 +14639,9 @@ module.exports = SetupView = Backbone.View.extend({
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     this.model.skills.each(_.bind(function(skillModel) {
-      var skillSetupView = new app.SetupSkillView({model: skillModel});
+      var skillSetupView = new SetupSkillView({model: skillModel});
       this.views.push(skillSetupView);
-      skillSetupView.render()
+      skillSetupView.render();
       this.$el.find('ul').append(skillSetupView.el);
     }, this));
     
@@ -14628,17 +14654,16 @@ module.exports = SetupView = Backbone.View.extend({
 
 require.alias("jquery-browserify", "/node_modules/jquery");
 
-require.define("/app/app.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
-  , Backbone =  require('backbone')
+require.define("/app/app.js",function(require,module,exports,__dirname,__filename,process,global){var _ = require('underscore')
+  , Backbone = require('backbone')
   , $ = require('jquery-browserify')
-  //, Settings = require('./settings')
   ;
 
 Backbone.$ = $;
 window.r = require; // Expose require, for console debugging
 var App = function() {
   this.initialize.apply(this, arguments);
-}
+};
 
 _.extend(App.prototype, {
   version: 0.1,
@@ -14650,6 +14675,14 @@ _.extend(App.prototype, {
 });
 
 $(function() {
+  Modernizr.addTest('inputspeech', function() {
+      return !(document.createElement("input").webkitSpeech === undefined);
+  });
+  Modernizr.addTest('svganchors', function() {
+    // cheating:
+    return !(/WebKit/.test(navigator.userAgent));
+  });
+
   window.PositionFinder = module.exports = new App();
 });
 });
