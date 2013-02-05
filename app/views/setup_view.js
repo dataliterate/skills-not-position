@@ -1,6 +1,8 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , SetupSkillView// = require('setupskill_view')
+  , SetupView
   ;
 
 module.exports = SetupView = Backbone.View.extend({
@@ -12,9 +14,9 @@ module.exports = SetupView = Backbone.View.extend({
   render: function() {
     this.$el.html(this.template(this.model.toJSON()));
     this.model.skills.each(_.bind(function(skillModel) {
-      var skillSetupView = new app.SetupSkillView({model: skillModel});
+      var skillSetupView = new SetupSkillView({model: skillModel});
       this.views.push(skillSetupView);
-      skillSetupView.render()
+      skillSetupView.render();
       this.$el.find('ul').append(skillSetupView.el);
     }, this));
     

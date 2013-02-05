@@ -1,5 +1,7 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
+
+  , Word
   ;
 
 module.exports = Word = Backbone.Model.extend({

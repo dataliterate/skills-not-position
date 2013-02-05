@@ -5,11 +5,29 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-reload');
   grunt.loadNpmTasks('grunt-less');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-mincss');
+  grunt.loadNpmTasks('grunt-yui-compressor');
+  grunt.loadNpmTasks('grunt-jslint');
 
   // Project configuration.
   grunt.initConfig({
-    lint: {
-      all: ['grunt.js', 'app.js']
+    jslint: {
+      files: ['app/**/*.js'],
+      directives: {
+        browser: true,
+        unparam: true,
+        indent: 2,
+        white: true,
+        nomen: true,
+        sloppy: true,
+        vars: true,
+        plusplus: true,
+        predef: [ // array of pre-defined globals
+          'require', 'module', 'Modernizr'
+        ]
+      },
+      options: {
+      }
     },
     copy: {
       main: {
@@ -25,11 +43,6 @@ module.exports = function(grunt) {
         options: {
           compress: true
         }
-      }
-    },
-    jshint: {
-      options: {
-        browser: true
       }
     },
     concat: {
@@ -48,6 +61,19 @@ module.exports = function(grunt) {
         aliases : ['jquery:jquery-browserify'] 
       }
     },
+    mincss: {
+      compress: {
+        files: {
+          "public/styles.min.css": ["public/styles.css"]
+        }
+      }
+    },
+    min: {
+        'dist': {
+            'src': ['public/app.js', 'public/lib.js'],
+            'dest': 'public/position-finder.min.js'
+        }
+    },
     reload: {
       port: 35729, // LR default
       liveReload: {}
@@ -61,6 +87,6 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint jshint concat min');
-  grunt.registerTask('build', 'browserify less concat copy');
+  grunt.registerTask('build', 'browserify less concat copy mincss min');
 
 };

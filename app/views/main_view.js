@@ -5,6 +5,8 @@ var _ =  require('underscore')
   , IndicatorView = require('./indicator_view')
   , SkillView = require('./skill_view')
   , SetupView = require('./setup_view')
+
+  , MainView
   ;
 
 module.exports = MainView = Backbone.View.extend({
@@ -21,7 +23,7 @@ module.exports = MainView = Backbone.View.extend({
     indicatorView: null,
     initialize: function() {
       this.$el = $(this.el);
-      this.inputElement = new InputElement;
+      this.inputElement = new InputElement();
       this.indicatorView = new IndicatorView({model: this.model});
       this.listenTo(this.inputElement, 'submit', this.submitScore);
       this.listenTo(this.inputElement, 'change', this.changeScore);
@@ -53,7 +55,7 @@ module.exports = MainView = Backbone.View.extend({
         'mic': Modernizr.inputspeech,
         'mouse': !Modernizr.touch,
         'touch': Modernizr.touch
-      }
+      };
       _.each(inputOptions, function(enabled, inputOption) {
         if(!enabled) {
           $('img#input-' + inputOption).addClass('disabled');
@@ -81,7 +83,6 @@ module.exports = MainView = Backbone.View.extend({
     submitScore: function() {
       //if last skill saved
       this.model.currentSkill().set({completed: true});
-      console.log(this.model.currentSkill());
 
       if(!this.model.hasNext()) {
         this.router.gotoPosition();
@@ -129,14 +130,14 @@ module.exports = MainView = Backbone.View.extend({
 
         var text = "My #designposition: " + position;
         text += " http://bit.ly/design-positions";
-        var url = "https://twitter.com/intent/tweet?text=" + escape(text);
+        var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
         window.location.href = url;
         
       });
 
       $('button.facebook').click(function(e) {
         var text = "My #designposition: " + position;
-        var url = "http://www.facebook.com/sharer/sharer.php?u=" + escape('http://bit.ly/design-positions') + "&t=" + escape(text);
+        var url = "http://www.facebook.com/sharer/sharer.php?u=" + window.escape('http://bit.ly/design-positions') + "&t=" + window.escape(text);
         window.location.href = url;
       });
     },
@@ -150,7 +151,6 @@ module.exports = MainView = Backbone.View.extend({
       }
     },
     statementLayout: function() {
-      console.log("))");
       $('body').removeClass('position');
       $('header h1').html('Rate this statement');
       if(!Modernizr.svganchors) {

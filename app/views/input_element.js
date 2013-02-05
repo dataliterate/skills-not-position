@@ -1,6 +1,7 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , InputElement
   ;
 
 module.exports = InputElement = Backbone.View.extend({
@@ -73,7 +74,7 @@ module.exports = InputElement = Backbone.View.extend({
     },
     onKeyDown: function(e) {
       var ENTER_KEY = 13;
-      if(e.keyCode == ENTER_KEY) {
+      if(e.keyCode === ENTER_KEY) {
         this.trigger('submit');
         return;
       }
@@ -101,9 +102,9 @@ module.exports = InputElement = Backbone.View.extend({
       // numeric input
       var num = null;
       if(!isNaN(String.fromCharCode(e.keyCode))) {
-        num = parseInt(String.fromCharCode(e.keyCode));
+        num = parseInt(String.fromCharCode(e.keyCode), 10);
       } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
-        num = parseInt(String.fromCharCode(e.keyCode - 48));
+        num = parseInt(String.fromCharCode(e.keyCode - 48), 10);
       }
       if(num === null) {
         return;
@@ -111,13 +112,12 @@ module.exports = InputElement = Backbone.View.extend({
       var score = num;
       // photoshop opacity layer style input
       if(this.waitingForCompletion) {
-        if(this.value == 10 && this.waitingForCompletion == 2) {
+        if(this.value === 10 && this.waitingForCompletion === 2) {
           num = 100;
         } else {
           num = this.value + num;
         }
-        if(num == 10) {
-          console.log("WON HUNDETEDT");
+        if(num === 10) {
           this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
           this.waitingForCompletion = 2;
           this.displayNumber();
@@ -139,15 +139,15 @@ module.exports = InputElement = Backbone.View.extend({
     },
     displayNumber: function() {
       var h = '';
-      if(this.waitingForCompletion == 1) {
-        if(this.value == 0) {
+      if(this.waitingForCompletion === 1) {
+        if(this.value === 0) {
           // special: change first char
           h += '<span class="changeable">' + String(this.value)[0] + '</span>';
         } else {
           h += String(this.value)[0];
           h += '<span class="changeable">' + String(this.value)[1] + '</span>';
         }
-      } else if(this.waitingForCompletion == 2) {
+      } else if(this.waitingForCompletion === 2) {
         // special: allow hundred
         h += '10<span class="changeable">&nbsp;</span>';
       } else {

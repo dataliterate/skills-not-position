@@ -12,7 +12,7 @@ var Words = Backbone.Collection.extend({
   },
   getByTitle: function(title) {
     return this.filter(function(model) {
-      return (model.get('title').toLowerCase() == title.toLowerCase());
+      return (model.get('title').toLowerCase() === title.toLowerCase());
     });
   },
   getWordsByGroup: function() {
@@ -21,25 +21,22 @@ var Words = Backbone.Collection.extend({
     });
   },
   getGroups: function() {
-    return _.map(this.getWordsByGroup(), function(x, k) {return k});
+    return _.map(this.getWordsByGroup(), function(x, k) {return k;});
   },
   getWordsInGroup: function(group) {
     var words = this.getWordsByGroup()[group];
-    console.log("GROUP");
     var sortedWords = _.sortBy(words, function(word) {
       //return -1 * (word.get('score') / word.get('n'));
-      var orderScore = (word.get('score') / Settings.N_STATEMENTS);
+      //var orderScore = (word.get('score') / Settings.N_STATEMENTS);
       var orderScore = (word.get('score') / word.get('n'));
-      if(word.get('n') == 0) {
+      if(word.get('n') === 0) {
         orderScore = -1000;
       }
       
-      //orderScore = word.get('score');
-      console.log(word.get('title') + ' ' + orderScore + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
+      //console.log(word.get('title') + ' ' + orderScore + ' -- ' + (word.get('score') / word.get('n')) + ' ' + word.get('score') + ' ' + word.get('n'));
       word.set({orderScore: orderScore});
       return -1 * orderScore;
     });
-    console.log(sortedWords);
     return sortedWords;
   }
 });
@@ -57,9 +54,9 @@ Field:
 Title:
   Architect, Evanglist
 */
-AppWords.addWordsToGroup('Enthusiastic, Motivated, Open-minded, Critical, Innovative, Reflecting, Technology-Loving'.split(', '), 'attitude');
-AppWords.addWordsToGroup('Senior-level, Experienced, Lead, Head of'.split(', '), 'level');
-AppWords.addWordsToGroup('UX, UI, IxD, Visual, Frontend, Digital Product, Multiscreen'.split(', '), 'field');
-AppWords.addWordsToGroup('Design Architect, Design Evanglist, Designer, Creative Coder, Design Engineer'.split(', '), 'title');
+AppWords.addWordsToGroup(['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Reflecting', 'Technology-Loving'], 'attitude');
+AppWords.addWordsToGroup(['Senior-level', 'Experienced', 'Lead', 'Head of'], 'level');
+AppWords.addWordsToGroup(['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Digital Product', 'Multiscreen'], 'field');
+AppWords.addWordsToGroup(['Design Architect', 'Design Evanglist', 'Designer', 'Creative Coder', 'Design Engineer'], 'title');
 
 module.exports = AppWords;

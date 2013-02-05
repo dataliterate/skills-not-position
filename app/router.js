@@ -9,15 +9,15 @@ var Router = Backbone.Router.extend({
   routes:{
     'statement/:n': 'statement',
     'position': 'position',
-    '': 'default'
+    '': 'defaultRoute'
   },
   session: null,
   mainView: null,
-  default: function() {
+  defaultRoute: function() {
     this.startSession();
   },
   statement: function(i) {
-    if(false && !this.hasSession()) {
+    if(!this.hasSession()) {
       this.navigate('');
       return;
     }
@@ -29,7 +29,7 @@ var Router = Backbone.Router.extend({
     this.session.set({'skillPos': i, 'analysed': false});
   },
   position: function() {
-    if(false && !this.hasSession()) {
+    if(!this.hasSession()) {
       this.navigate('');
       return;
     }

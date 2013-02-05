@@ -3,6 +3,8 @@ var _ =  require('underscore')
   , Settings = require('../settings')
   , AppWords = require('../collections/app_words')
   , AppSkills = require('../collections/app_skills')
+
+  , Session
   ;
 
 module.exports = Session = Backbone.Model.extend({
@@ -44,12 +46,10 @@ module.exports = Session = Backbone.Model.extend({
 
       // getting range
       this.skills.each(function(skill) {
-        console.log(skill);
         if(!skill.get('completed')) {
           return;
         }
         var score = skill.get('score');
-        console.log(" X X X");
         min = Math.min(min, score);
         max = Math.max(max, score);
         sum += score;
@@ -58,6 +58,7 @@ module.exports = Session = Backbone.Model.extend({
 
       avg = sum / n;
       absoluteAvg = (avg - min) / (max - min) * 100;
+      /*
       console.log("\n");
       console.log("\n");
       console.log("--- - ----- ---- - - --- - ----- -- ");
@@ -68,14 +69,14 @@ module.exports = Session = Backbone.Model.extend({
       console.log("--- - ----- ---- - - --- - ----- -- ");
       console.log("\n");
       console.log("\n");
-
-      if(min == max && avg == 50) {
+      */
+      if(min === max && avg === 50) {
         exception = 'avg';
       }
-      if(min == max && avg == 100) {
+      if(min === max && avg === 100) {
         exception = '100';
       }
-      if(min == max && avg == 0) {
+      if(min === max && avg === 0) {
         exception = '0';
       }
 
@@ -87,14 +88,8 @@ module.exports = Session = Backbone.Model.extend({
         if(_.isUndefined(userScore)) {
           userScore = 0;
         }
-        console.log("\n");
-        console.log(skill.get('title'));
-        console.log(userScore);
 
         var absoluteScore = (userScore - min) / (max - min) * 100;
-        console.log(absoluteScore);
-
-        console.log(absoluteScore - absoluteAvg);
 
         var score = absoluteScore - absoluteAvg;
         userScore -= 40;
@@ -124,12 +119,14 @@ module.exports = Session = Backbone.Model.extend({
       
       var words = AppWords.getWordsInGroup(group);
       grouped[group] = words;
-      var min = _.min(words, function(w) { return w.get('orderScore')});
-      var max = _.max(words, function(w) { return w.get('orderScore')});
+      var min = _.min(words, function(w) { return w.get('orderScore');});
+      var max = _.max(words, function(w) { return w.get('orderScore');});
+      /*
       console.log("\n");
       console.log("\n");
       console.log(group);
       console.log(min.get('orderScore') + " " + max.get('orderScore') + " " + Math.abs(max.get('orderScore') - min.get('orderScore')));
+      */
       groupRanges[group] = {min: min.get('orderScore'), max: max.get('orderScore'), range: Math.abs(max.get('orderScore') - min.get('orderScore'))};
       
     });
@@ -139,16 +136,16 @@ module.exports = Session = Backbone.Model.extend({
     --
     Attitude [, Attitude] Level Field [Field] [Title] Designer
     */
-    var title = grouped['attitude'][0].get('title');
-    if(grouped['attitude'][0].get('orderScore') - grouped['attitude'][1].get('orderScore') < groupRanges['attitude'].range / 10) {
-      title += ', ' + grouped['attitude'][1].get('title');
+    var title = grouped.attitude[0].get('title');
+    if(grouped.attitude[0].get('orderScore') - grouped.attitude[1].get('orderScore') < groupRanges.attitude.range / 10) {
+      title += ', ' + grouped.attitude[1].get('title');
     }
-    title += ' ' + _.first(grouped['level']).get('title');
-    title += ' ' + grouped['field'][0].get('title');
-    if(grouped['field'][0].get('orderScore') - grouped['field'][1].get('orderScore') < groupRanges['field'].range / 10) {
-      title += ' & ' + grouped['field'][1].get('title');
+    title += ' ' + _.first(grouped.level).get('title');
+    title += ' ' + grouped.field[0].get('title');
+    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 10) {
+      title += ' & ' + grouped.field[1].get('title');
     }
-    title += ' ' + _.first(grouped['title']).get('title');
+    title += ' ' + _.first(grouped.title).get('title');
     return title;
 
   }

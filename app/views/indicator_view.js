@@ -1,17 +1,19 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
+  , IndicatorView
   ;
 
-module.exports = IndicatorView = Backbone.View.extend({
+IndicatorView = module.exports = Backbone.View.extend({
   initialize: function() {
     this.listenTo(this.model, "change:skillPos", this.onSkillPosChanged);
   },
   render: function() {
     var h = '<ul>';
     var currentPos = this.model.get('skillPos');
-    for(var i = 0; i < this.model.nStatements; i++) {
-      if(i == currentPos) {
+    var i;
+    for(i = 0; i < this.model.nStatements; i++) {
+      if(i === currentPos) {
         h += '<li class="active"><span href="#" data-target="' + (i + 1) + '">' + (i + 1) + '</span></li>';
       } else if(this.model.skills.at(i).get('completed')) {
         h += '<li><a href="#statement/' + (i + 1) + '" data-target="' + (i + 1) + '">' + (i + 1) + '</a></li>';
