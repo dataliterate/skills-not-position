@@ -36,6 +36,10 @@ module.exports = function(grunt) {
       lib: {
         src: ['lib/fixsvgstack.jquery.js', 'lib/html5slider.js', 'lib/keyboard.js', 'lib/modernizr.js', 'lib/tipsy.js'],
         dest: 'public/lib.js'
+      },
+      css: {
+        src: ['public/styles.css', 'lib/tipsy.css'],
+        dest: 'public/styles.css'
       }
     },
     browserify: {
@@ -50,7 +54,7 @@ module.exports = function(grunt) {
     },
     watch:{
       files:['app/**/*'],
-      tasks:['browserify', 'concat', 'reload']
+      tasks:['build']
     },
     all: ['app/**/*.js']
   });
