@@ -2,6 +2,7 @@ var _ =  require('underscore')
   , Backbone = require('backbone')
   , Settings = require('../settings')
   , Word = require('../models/word')
+  , data = require('../data').words();
   ;
 
 var Words = Backbone.Collection.extend({
@@ -43,6 +44,10 @@ var Words = Backbone.Collection.extend({
 
 var AppWords = new Words();
 
+_.each(data, function(wordList, group) {
+  AppWords.addWordsToGroup(wordList, group);
+});
+
 /**
 Attitudes:
   Enthusiastic, Motivated, Open-minded, Critical
@@ -54,9 +59,5 @@ Field:
 Title:
   Architect, Evanglist
 */
-AppWords.addWordsToGroup(['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Reflecting', 'Technology-Loving'], 'attitude');
-AppWords.addWordsToGroup(['Senior-level', 'Experienced', 'Lead', 'Head of'], 'level');
-AppWords.addWordsToGroup(['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Digital Product', 'Multiscreen'], 'field');
-AppWords.addWordsToGroup(['Design Architect', 'Design Evanglist', 'Designer', 'Creative Coder', 'Design Engineer'], 'title');
 
 module.exports = AppWords;

@@ -1,6 +1,7 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
   , AppWords = require('./app_words')
+  , data = require('../data').skills();
   ;
 
 var Skills = Backbone.Collection.extend({
@@ -29,6 +30,21 @@ function w(title, quotient) {
   return [AppWords.getByTitle(title)[0], quotient];
 }
 
+var skills = [];
+_.each(data, function(skillData) {
+
+  var skill = {};
+  skill.title = skillData.title;
+  skill.quantifiers = [];
+  _.each(skill.quantifiers, function(value, word) {
+    skill.quantifiers.push(w(word, value));
+  });
+  skills.push(skill);
+});
+
+module.exports = Skills = new Skills(_.shuffle(skills));
+
+/*
 module.exports = Skills = new Skills(_.shuffle([
 {
   title: 'I am an experienced (4+) visual designer',
@@ -208,3 +224,4 @@ module.exports = Skills = new Skills(_.shuffle([
   ]
 }
 ]));
+*/
