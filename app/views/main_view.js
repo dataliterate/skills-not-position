@@ -27,6 +27,7 @@ module.exports = MainView = Backbone.View.extend({
       this.indicatorView = new IndicatorView({model: this.model});
       this.listenTo(this.inputElement, 'submit', this.submitScore);
       this.listenTo(this.inputElement, 'change', this.changeScore);
+
       this.listenTo(this.model, 'change:skillPos', this.skillChange);
       
     },
@@ -97,24 +98,54 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.set(score);
       $('#ios-keyboard').val();
     },
-    skillChange: function() {
+    skillChange: function(e) {
       this.statementLayout();
+      window.scrollTo(0, 1);
 
+      var oldh = $('#skill').height();
+      $('#scores').removeClass('active').hide();
+      $('#skill').removeClass('animated').addClass('new-skill').css("height", "auto");
+      
       var currentSkill = this.model.currentSkill();
       this.listenTo(currentSkill, 'change:score', this.onScoreChange);
       this.skillView = new SkillView({model: this.model.currentSkill()});
       this.skillView.$el = this.$el.find('#skill');
       this.skillView.render();
+      this.inputElement.set(0);
+
+      var setScore = _.bind(function() {
+        // strange, default value sometimes is undefined: quick fix:
+        var score = this.model.currentSkill().get('score');
+        if(!score) {
+          this.model.currentSkill().set({'score': 50});
+        } else {
+          this.model.currentSkill().trigger('change:score');
+        }
+      }, this);
+
+      if(oldh != null) {
+        var h = $('#skill').height();
+        $('#skill').css('height', oldh + 'px');
+        $('#scores').addClass('flash').show();
+        _.delay(function() {
+          $('#skill').addClass('animated').removeClass('new-skill').css('height', h + 'px');
+          _.delay(function() {
+            $('#scores').show();
+            _.delay(function() {
+              setScore();
+              $('#scores').removeClass('flash');
+              _.delay(function() {
+                $('#scores').addClass('active');
+                $('#skill').removeClass('animated').css("height", "auto");
+              }, 400);
+            }, 10);
+          }, 100);
+          
+        }, 500);
+      }
 
       //this.skillView.appendInput(this.inputElement.$el);
 
-      // strange, default value sometimes is undefined: quick fix:
-      var score = this.model.currentSkill().get('score');
-      if(!score) {
-        this.model.currentSkill().set({'score': 50});
-      } else {
-        this.model.currentSkill().trigger('change:score');
-      }
     },
     changeRange: function(e) {
       var x = $(e.currentTarget).val();
@@ -141,9 +172,13 @@ module.exports = MainView = Backbone.View.extend({
         window.location.href = url;
       });
     },
+    currentLayout: null,
     positionLayout: function() {
-      $('body').addClass('position');
-      $('header h1').html('My position');
+      if(this.currentLayout == 'position') {
+        return;
+      }
+      this.currentLayout = 'position';
+      $('body').addClass('position').removeClass('statement');
 
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();
@@ -151,8 +186,14 @@ module.exports = MainView = Backbone.View.extend({
       }
     },
     statementLayout: function() {
-      $('body').removeClass('position');
-      $('header h1').html('Rate this statement');
+
+      if(this.currentLayout == 'statement') {
+        return;
+      }
+      this.currentLayout = 'statement';
+      
+      $('body').removeClass('position').addClass('statement');
+      
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();
       }

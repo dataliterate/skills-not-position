@@ -25,7 +25,7 @@ module.exports = Session = Backbone.Model.extend({
     return false;
   },
   next: function() {
-    this.set('skillPos', this.get('skillPos') + 1);
+    //this.set('skillPos', this.get('skillPos') + 1);
   },
   getPosition: function() {
     /**

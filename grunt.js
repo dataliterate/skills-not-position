@@ -32,7 +32,8 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          {src: ['svgs/stack/stack.svg'], dest: 'public/assets/stack.svg', filter: 'isFile'} // includes files in path
+          {src: ['svgs/stack/stack.svg'], dest: 'public/assets/stack.svg', filter: 'isFile'}, // includes files in path
+          {src: ['public/styles.css'], dest: 'reloadhack/styles.css', filter: 'isFile'} // 
         ]
       }
     },
@@ -69,17 +70,20 @@ module.exports = function(grunt) {
       }
     },
     min: {
-        'dist': {
-            'src': ['public/app.js', 'public/lib.js'],
-            'dest': 'public/position-finder.min.js'
-        }
+      'dist': {
+        'src': ['public/app.js', 'public/lib.js'],
+        'dest': 'public/position-finder.min.js'
+      }
     },
     reload: {
       port: 35729, // LR default
-      liveReload: {}
+      liveReload: {},
+      xproxy: {
+        host: '10.42.30.30:8000'
+      }
     },
     watch:{
-      files:['app/**/*'],
+      files:['app/**/*', './styles.less'],
       tasks:['build']
     },
     all: ['app/**/*.js']
@@ -87,6 +91,7 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint jshint concat min');
-  grunt.registerTask('build', 'browserify less concat copy mincss min');
+  grunt.registerTask('build', 'browserify less concat copy reload mincss min');
+  grunt.registerTask('build:dev', 'browserify less concat copy');
 
 };

@@ -18,10 +18,9 @@ var Router = Backbone.Router.extend({
   },
   statement: function(i) {
     if(!this.hasSession()) {
-      this.navigate('');
+      this.navigate('', {trigger: true});
       return;
     }
-    this.startSession();
     i = parseInt(i, 10) - 1;
     if(!_.isNumber(i) || i > Settings.N_STATEMENTS) {
       return;
@@ -33,7 +32,6 @@ var Router = Backbone.Router.extend({
       this.navigate('');
       return;
     }
-    this.startSession();
     this.mainView.showPosition();
   },
   startSession: function() {
@@ -42,8 +40,8 @@ var Router = Backbone.Router.extend({
       this.mainView = new MainView({model: this.session});
       this.mainView.router = this;
       this.mainView.render();
-      this.navigate('statement/' + 1, {trigger: true});
     }
+    this.navigate('statement/' + 1, {trigger: true});
   },
   hasSession: function() {
     return this.session;

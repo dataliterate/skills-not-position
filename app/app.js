@@ -27,5 +27,9 @@ $(function() {
     return !(/WebKit/.test(navigator.userAgent));
   });
 
+  _.delay(function() {
+    window.scrollTo(0, 1);
+  }, 1000);
+
   window.PositionFinder = module.exports = new App();
 });
