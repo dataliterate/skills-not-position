@@ -204,9 +204,9 @@ module.exports = InputElement = Backbone.View.extend({
       this.$scorer.val(this.value);
 
       if(this.value > 50) {
-        $('#app').css('background', 'RGBA(255, 255, 255, ' + ((this.value - 50) / 100) / 20 + ')');
+        $('.fader').css('background', 'RGBA(255, 255, 255, ' + ((this.value - 50) / 100) / 20 + ')');
       } else {
-        $('#app').css('background', 'RGBA(0, 0, 0, ' + ((50 - this.value) / 100) / 5 + ')');
+        $('.fader').css('background', 'RGBA(0, 0, 0, ' + ((50 - this.value) / 100) / 5 + ')');
       }
       
     },

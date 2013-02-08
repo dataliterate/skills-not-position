@@ -40,6 +40,11 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.$el = $('#input');
       this.inputElement.render();
 
+
+      $('#teaser').click(function(e) {
+        e.preventDefault();
+        $('body').removeClass('teaser-open');
+      });
       if(!Modernizr.svganchors) {
         $('img.svg').fixSVGStack();
       }
@@ -99,14 +104,21 @@ module.exports = MainView = Backbone.View.extend({
       $('#ios-keyboard').val();
     },
     skillChange: function(e) {
+      var currentSkill = this.model.currentSkill();
+      if(currentSkill == null) {
+        return;
+      }
       this.statementLayout();
       window.scrollTo(0, 1);
+
+      if(this.model.get('skillPos') > 0 && $('body').hasClass('teaser-open')) {
+        $('body').removeClass('teaser-open');
+      }
 
       var oldh = $('#skill').height();
       $('#scores').removeClass('active').hide();
       $('#skill').removeClass('animated').addClass('new-skill').css("height", "auto");
-      
-      var currentSkill = this.model.currentSkill();
+
       this.listenTo(currentSkill, 'change:score', this.onScoreChange);
       this.skillView = new SkillView({model: this.model.currentSkill()});
       this.skillView.$el = this.$el.find('#skill');

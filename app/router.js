@@ -17,6 +17,7 @@ var Router = Backbone.Router.extend({
     this.startSession();
   },
   statement: function(i) {
+    console.log("ASS");
     if(!this.hasSession()) {
       this.navigate('', {trigger: true});
       return;
@@ -32,6 +33,7 @@ var Router = Backbone.Router.extend({
       this.navigate('');
       return;
     }
+    this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },
   startSession: function() {
