@@ -13717,11 +13717,11 @@ var Router = Backbone.Router.extend({
     this.startSession();
   },
   statement: function(i) {
+    console.log("ASS");
     if(!this.hasSession()) {
-      this.navigate('');
+      this.navigate('', {trigger: true});
       return;
     }
-    this.startSession();
     i = parseInt(i, 10) - 1;
     if(!_.isNumber(i) || i > Settings.N_STATEMENTS) {
       return;
@@ -13733,7 +13733,7 @@ var Router = Backbone.Router.extend({
       this.navigate('');
       return;
     }
-    this.startSession();
+    this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },
   startSession: function() {
@@ -13742,8 +13742,8 @@ var Router = Backbone.Router.extend({
       this.mainView = new MainView({model: this.session});
       this.mainView.router = this;
       this.mainView.render();
-      this.navigate('statement/' + 1, {trigger: true});
     }
+    this.navigate('statement/' + 1, {trigger: true});
   },
   hasSession: function() {
     return this.session;
@@ -13770,7 +13770,7 @@ var Settings = function() {
 };
 
 _.extend(Settings.prototype, {
-  N_STATEMENTS: 4,
+  N_STATEMENTS: 12,
   initialize: function() {
     
   }
@@ -13807,7 +13807,7 @@ module.exports = Session = Backbone.Model.extend({
     return false;
   },
   next: function() {
-    this.set('skillPos', this.get('skillPos') + 1);
+    //this.set('skillPos', this.get('skillPos') + 1);
   },
   getPosition: function() {
     /**
@@ -13938,6 +13938,7 @@ require.define("/app/collections/app_words.js",function(require,module,exports,_
   , Backbone = require('backbone')
   , Settings = require('../settings')
   , Word = require('../models/word')
+  , data = require('../data').words();
   ;
 
 var Words = Backbone.Collection.extend({
@@ -13979,6 +13980,10 @@ var Words = Backbone.Collection.extend({
 
 var AppWords = new Words();
 
+_.each(data, function(wordList, group) {
+  AppWords.addWordsToGroup(wordList, group);
+});
+
 /**
 Attitudes:
   Enthusiastic, Motivated, Open-minded, Critical
@@ -13990,10 +13995,6 @@ Field:
 Title:
   Architect, Evanglist
 */
-AppWords.addWordsToGroup(['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Reflecting', 'Technology-Loving'], 'attitude');
-AppWords.addWordsToGroup(['Senior-level', 'Experienced', 'Lead', 'Head of'], 'level');
-AppWords.addWordsToGroup(['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Digital Product', 'Multiscreen'], 'field');
-AppWords.addWordsToGroup(['Design Architect', 'Design Evanglist', 'Designer', 'Creative Coder', 'Design Engineer'], 'title');
 
 module.exports = AppWords;
 });
@@ -14021,9 +14022,41 @@ module.exports = Word = Backbone.Model.extend({
 });
 });
 
+require.define("/app/data.js",function(require,module,exports,__dirname,__filename,process,global){var _ = require('underscore')
+  ;
+
+var Data = function() {
+  this.initialize.apply(this, arguments);
+};
+
+_.extend(Data.prototype, {
+  initialize: function() {
+    if(!window.PositionFinderData) {
+      console.error("Could not find PositionFinderData");
+    }
+  },
+  words: function() {
+    if(window.PositionFinderData.words) {
+      return window.PositionFinderData.words;
+    }
+    console.error("Could not find PositionFinderData.words");
+  },
+  skills: function() {
+    if(window.PositionFinderData.skills) {
+      return window.PositionFinderData.skills;
+    }
+    console.error("Could not find PositionFinderData.skills");
+  },
+});
+
+var SingletonData = new Data();
+module.exports = SingletonData;
+});
+
 require.define("/app/collections/app_skills.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , AppWords = require('./app_words')
+  , data = require('../data').skills();
   ;
 
 var Skills = Backbone.Collection.extend({
@@ -14052,6 +14085,21 @@ function w(title, quotient) {
   return [AppWords.getByTitle(title)[0], quotient];
 }
 
+var skills = [];
+_.each(data, function(skillData) {
+
+  var skill = {};
+  skill.title = skillData.title;
+  skill.quantifiers = [];
+  _.each(skill.quantifiers, function(value, word) {
+    skill.quantifiers.push(w(word, value));
+  });
+  skills.push(skill);
+});
+
+module.exports = Skills = new Skills(_.shuffle(skills));
+
+/*
 module.exports = Skills = new Skills(_.shuffle([
 {
   title: 'I am an experienced (4+) visual designer',
@@ -14231,6 +14279,7 @@ module.exports = Skills = new Skills(_.shuffle([
   ]
 }
 ]));
+*/
 });
 
 require.define("/app/views/main_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
@@ -14262,6 +14311,7 @@ module.exports = MainView = Backbone.View.extend({
       this.indicatorView = new IndicatorView({model: this.model});
       this.listenTo(this.inputElement, 'submit', this.submitScore);
       this.listenTo(this.inputElement, 'change', this.changeScore);
+
       this.listenTo(this.model, 'change:skillPos', this.skillChange);
       
     },
@@ -14274,6 +14324,11 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.$el = $('#input');
       this.inputElement.render();
 
+
+      $('#teaser').click(function(e) {
+        e.preventDefault();
+        $('body').removeClass('teaser-open');
+      });
       if(!Modernizr.svganchors) {
         $('img.svg').fixSVGStack();
       }
@@ -14332,24 +14387,61 @@ module.exports = MainView = Backbone.View.extend({
       this.inputElement.set(score);
       $('#ios-keyboard').val();
     },
-    skillChange: function() {
-      this.statementLayout();
-
+    skillChange: function(e) {
       var currentSkill = this.model.currentSkill();
+      if(currentSkill == null) {
+        return;
+      }
+      this.statementLayout();
+      window.scrollTo(0, 1);
+
+      if(this.model.get('skillPos') > 0 && $('body').hasClass('teaser-open')) {
+        $('body').removeClass('teaser-open');
+      }
+
+      var oldh = $('#skill').height();
+      $('#scores').removeClass('active').hide();
+      $('#skill').removeClass('animated').addClass('new-skill').css("height", "auto");
+
       this.listenTo(currentSkill, 'change:score', this.onScoreChange);
       this.skillView = new SkillView({model: this.model.currentSkill()});
       this.skillView.$el = this.$el.find('#skill');
       this.skillView.render();
+      this.inputElement.set(0);
+
+      var setScore = _.bind(function() {
+        // strange, default value sometimes is undefined: quick fix:
+        var score = this.model.currentSkill().get('score');
+        if(!score) {
+          this.model.currentSkill().set({'score': 50});
+        } else {
+          this.model.currentSkill().trigger('change:score');
+        }
+      }, this);
+
+      if(oldh != null) {
+        var h = $('#skill').height();
+        $('#skill').css('height', oldh + 'px');
+        $('#scores').addClass('flash').show();
+        _.delay(function() {
+          $('#skill').addClass('animated').removeClass('new-skill').css('height', h + 'px');
+          _.delay(function() {
+            $('#scores').show();
+            _.delay(function() {
+              setScore();
+              $('#scores').removeClass('flash');
+              _.delay(function() {
+                $('#scores').addClass('active');
+                $('#skill').removeClass('animated').css("height", "auto");
+              }, 400);
+            }, 10);
+          }, 100);
+          
+        }, 500);
+      }
 
       //this.skillView.appendInput(this.inputElement.$el);
 
-      // strange, default value sometimes is undefined: quick fix:
-      var score = this.model.currentSkill().get('score');
-      if(!score) {
-        this.model.currentSkill().set({'score': 50});
-      } else {
-        this.model.currentSkill().trigger('change:score');
-      }
     },
     changeRange: function(e) {
       var x = $(e.currentTarget).val();
@@ -14376,9 +14468,13 @@ module.exports = MainView = Backbone.View.extend({
         window.location.href = url;
       });
     },
+    currentLayout: null,
     positionLayout: function() {
-      $('body').addClass('position');
-      $('header h1').html('My position');
+      if(this.currentLayout == 'position') {
+        return;
+      }
+      this.currentLayout = 'position';
+      $('body').addClass('position').removeClass('statement');
 
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();
@@ -14386,8 +14482,14 @@ module.exports = MainView = Backbone.View.extend({
       }
     },
     statementLayout: function() {
-      $('body').removeClass('position');
-      $('header h1').html('Rate this statement');
+
+      if(this.currentLayout == 'statement') {
+        return;
+      }
+      this.currentLayout = 'statement';
+      
+      $('body').removeClass('position').addClass('statement');
+      
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();
       }
@@ -14411,9 +14513,12 @@ module.exports = InputElement = Backbone.View.extend({
     template: _.template(
       $('#input-element-tmpl').html()
     ),
+    $scorer: null,
     value: 0,
     initialize: function() {
       $('body').keydown(_.bind(this.onKeyDown, this));
+      this.throttledDisplay = function() {};
+      
     },
     render: function() {
       //this.$el = $('<div id="skill-input"></div>');
@@ -14425,22 +14530,35 @@ module.exports = InputElement = Backbone.View.extend({
       } else {
         this.$el.find('#speechinput')[0].onwebkitspeechchange = _.bind(this.onSpeechChange, this);
       }
-
-      this.$el.find('#scorer').change(_.bind(this.onRangeChange, this));
+      this.$scorer = this.$el.find('#scorer');
+      this.$scorer.change(_.bind(this.onRangeChange, this));
       this.$el.find('#submit').click(_.bind(this.onSubmit, this));
       if(Modernizr.touch) {
-        this.$el.find('#scorer').bind('touchstart', _.bind(this.onTouch, this));
-        this.$el.find('#scorer').bind('touchmove', _.bind(this.onTouch, this));
+        this.$scorer.bind('touchstart', _.bind(this.onTouchStart, this));
+        this.$scorer.bind('touchmove', _.bind(this.onTouchMove, this));
       }
+
+      this.throttledDisplay = _.throttle(_.bind(this.display, this), 50);
       //this.$el.find('#scorer').bind('click', _.bind(this.onTouch, this));
     },
-    onTouch: function(e) {
-      var $scorer = this.$el.find('#scorer');
+    touchData: {},
+    onTouchStart: function(e) {
+      e.preventDefault();
+      $('.indicator-wrapper').removeClass('animated');
       var touch = event.touches[0];
-      var v = Math.round((touch.pageX - $scorer.offset().left) / $scorer.width() * 100);
+      this.touchData.width = this.$scorer.width();
+      this.touchData.offsetLeft = this.$scorer.offset().left;
+      var v = Math.round((touch.pageX - this.touchData.offsetLeft) / this.touchData.width * 100);
+      this.trigger('change', v);
+    },
+    onTouchMove: function(e) {
+      e.preventDefault();
+      var touch = event.touches[0];
+      var v = Math.round((touch.pageX - this.touchData.offsetLeft) / this.touchData.width * 100);
       this.trigger('change', v);
     },
     onRangeChange: function(e) {
+      $('.indicator-wrapper').removeClass('animated');
       var v = $(e.currentTarget).val();
       this.trigger('change', v);
     },
@@ -14448,6 +14566,7 @@ module.exports = InputElement = Backbone.View.extend({
       this.trigger('submit');
     },
     onSpeechChange: function(e) {
+      $('.indicator-wrapper').addClass('animated');
       $('#speechinput').removeClass('error');
       if(['weiter', 'enter'].indexOf($(e.currentTarget).val()) !== -1) {
         this.trigger('submit');
@@ -14475,64 +14594,89 @@ module.exports = InputElement = Backbone.View.extend({
       this.displayNumber();
     },
     onKeyDown: function(e) {
-      var ENTER_KEY = 13;
-      if(e.keyCode === ENTER_KEY) {
-        this.trigger('submit');
-        return;
-      }
 
-      // up, down, shift+up, shift+down
-      var UP_KEY = 38;
-      var DOWN_KEY = 40;
-      var LEFT_KEY = 37;
-      var RIGHT_KEY = 39;
-      switch(e.keyCode) {
-        case UP_KEY:
-          this.manipulateScore(10);
+      var processKey = _.bind(function(keyCode) {
+        $('.indicator-wrapper').addClass('animated');
+        var ENTER_KEY = 13;
+        var CHROME_ANDROID_ENTER_KEY = 61;
+        if(keyCode === ENTER_KEY || keyCode === CHROME_ANDROID_ENTER_KEY) {
+          this.trigger('submit');
           return;
-        case DOWN_KEY:
-          this.manipulateScore(-10);
-          return;
-        case LEFT_KEY:
-          this.manipulateScore(-1);
-          return;
-        case RIGHT_KEY:
-          this.manipulateScore(1);
-          return;
-      }
-
-      // numeric input
-      var num = null;
-      if(!isNaN(String.fromCharCode(e.keyCode))) {
-        num = parseInt(String.fromCharCode(e.keyCode), 10);
-      } else if(!isNaN(String.fromCharCode(e.keyCode - 48))) {
-        num = parseInt(String.fromCharCode(e.keyCode - 48), 10);
-      }
-      if(num === null) {
-        return;
-      }
-      var score = num;
-      // photoshop opacity layer style input
-      if(this.waitingForCompletion) {
-        if(this.value === 10 && this.waitingForCompletion === 2) {
-          num = 100;
-        } else {
-          num = this.value + num;
         }
-        if(num === 10) {
+
+        // up, down, shift+up, shift+down
+        var UP_KEY = 38;
+        var DOWN_KEY = 40;
+        var LEFT_KEY = 37;
+        var RIGHT_KEY = 39;
+        switch(e.keyCode) {
+          case UP_KEY:
+            this.manipulateScore(10);
+            return;
+          case DOWN_KEY:
+            this.manipulateScore(-10);
+            return;
+          case LEFT_KEY:
+            this.manipulateScore(-1);
+            return;
+          case RIGHT_KEY:
+            this.manipulateScore(1);
+            return;
+        }
+
+        // numeric input
+        var num = null;
+        if(!isNaN(String.fromCharCode(keyCode))) {
+          num = parseInt(String.fromCharCode(keyCode), 10);
+        } else if(!isNaN(String.fromCharCode(keyCode - 48))) {
+          num = parseInt(String.fromCharCode(keyCode - 48), 10);
+        }
+        if(num === null) {
+          return;
+        }
+        var score = num;
+        // photoshop opacity layer style input
+        if(this.waitingForCompletion) {
+          if(this.value === 10 && this.waitingForCompletion === 2) {
+            num = 100;
+          } else {
+            num = this.value + num;
+          }
+          if(num === 10) {
+            this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
+            this.waitingForCompletion = 2;
+            this.displayNumber();
+          } else {
+            this.stopWaitingForCompletion();
+          }
+        } else {
+          num = num * 10;
           this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
-          this.waitingForCompletion = 2;
-          this.displayNumber();
-        } else {
-          this.stopWaitingForCompletion();
+          this.waitingForCompletion = 1;
         }
+
+        this.trigger('change', num);
+      }, this);
+
+      if(e.keyCode == 229) {
+        // fix chrome android bug:
+        _.delay(function() {
+          var input = $('#ios-keyboard').val();
+          if(!input.length) {
+            return;
+          }
+          var keyCode = input.charCodeAt(0);
+          if(input == "\n") {
+            keyCode = 13;
+          }
+          $('#ios-keyboard').val('');
+          processKey(keyCode);
+        }, 50);
       } else {
-        num = num * 10;
-        this.waitingForCompletionTimer = window.setTimeout(_.bind(this.stopWaitingForCompletion, this), 900);
-        this.waitingForCompletion = 1;
+        e.preventDefault();
+        processKey(e.keyCode);
       }
 
-      this.trigger('change', num);
     },
     manipulateScore: function(score) {
       var currentScore = this.value;
@@ -14555,13 +14699,24 @@ module.exports = InputElement = Backbone.View.extend({
       } else {
         h += '<span class="overwritable">' + String(this.value) + '</span>';
       }
+
       this.$el.find('#score').html(h);
+    },
+    display: function() {
+      this.displayNumber();
+      $('.indicator-wrapper').css('width', this.value + '%');
+      this.$scorer.val(this.value);
+
+      if(this.value > 50) {
+        $('.fader').css('background', 'RGBA(255, 255, 255, ' + ((this.value - 50) / 100) / 2 + ')');
+      } else {
+        $('.fader').css('background', 'RGBA(0, 0, 0, ' + ((50 - this.value) / 100) / 5 + ')');
+      }
+      
     },
     set: function(v) {
       this.value = v;
-      this.displayNumber();
-      $('.indicator-wrapper').css('width', v + '%');
-      this.$el.find('#scorer').val(v);
+      this.throttledDisplay();
     }
   });
 });
@@ -14682,6 +14837,10 @@ $(function() {
     // cheating:
     return !(/WebKit/.test(navigator.userAgent));
   });
+
+  _.delay(function() {
+    window.scrollTo(0, 1);
+  }, 1000);
 
   window.PositionFinder = module.exports = new App();
 });

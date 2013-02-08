@@ -11,14 +11,14 @@ Title:
 */
 window.PositionFinderData = {
   'words': {
-    'attitude': ['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Reflecting', 'Technology-Loving'],
-    'level': ['Senior-level', 'Experienced', 'Lead', 'Head of'],
-    'field': ['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Digital Product', 'Multiscreen'],
-    'title': ['Design Architect', 'Design Evanglist', 'Designer', 'Creative Coder', 'Design Engineer']
+    'attitude': ['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Focused', 'Technology-Loving', 'Hands-On', 'Curious', 'Organized'],
+    'level': ['Senior-level', 'Experienced', 'Lead', 'Head of', 'Chief'],
+    'field': ['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Code', 'Mobile', 'Digital Product', 'App', 'Multiscreen'],
+    'title': ['Design Architect', 'Design Evanglist', 'Designer', 'Design Hacker', 'Design Engineer', 'Design Strategist']
   },
   'skills': [
   {
-    title: 'I have the experience and ability to lead a project',
+    title: 'I watched "Helvetica" more often than "Titanic"',
     quantifiers: {
       'Lead': 10,
       'Senior-level': 5,
@@ -36,7 +36,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I create interfaces for large HDTVs, tiny mobile phones and everything in between',
+    title: 'It\'s more likely to find a book about design on my nightstand than a novel',
     quantifiers: {
       'Visual': 7,
       'UI': 10,
@@ -46,7 +46,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I share my own ideas and opinion on the web',
+    title: 'I have a healthy obsession for details',
     quantifiers: {
       'Design Evanglist': 7,
       'Open-minded': 10,
@@ -55,7 +55,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I have a passion for interactive design',
+    title: 'Agile is my middlename',
     quantifiers: {
       'UI': 0,
       'Designer': 10,
@@ -65,7 +65,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I reflect, rethink and improve my design workflow',
+    title: 'I am comitted to version control',
     quantifiers: {
       'Innovative': 10,
       'Technology-Loving': 0,
@@ -75,7 +75,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I experiment with CSS3 to create stunning visual results',
+    title: 'Grid',
     quantifiers: {
       'Frontend': 10,
       'Technology-Loving': 8,
@@ -86,7 +86,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I have a strong understanding of web development',
+    title: 'I am incurably curious about all things digital',
     quantifiers: {
       'Frontend': 10,
       'Design Architect': 8,
@@ -97,7 +97,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I have natural mentoring instincts to lead and care for fellow team members',
+    title: 'I thrive in interdisciplinary environments',
     quantifiers: {
       'Lead': 10,
       'Design Evanglist': 10,
@@ -107,14 +107,14 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I have the willingness to share my knowledge',
+    title: 'I have impressive skills in visual storytelling, ideation and sketching',
     quantifiers: {
       'Open-Minded': 10,
       'Design Evanglist': 2
     }
   },
   {
-    title: 'I have impressive skills in visual storytelling, ideation and sketching',
+    title: 'Breakdance',
     quantifiers: {
       'Designer': 6,
       'UX': 8,
@@ -122,13 +122,13 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I love teamwork and brainstorming sessions',
+    title: 'Paper is for sketching, what salt is for cooking',
     quantifiers: {
       'Open-minded': 10
     }
   },
   {
-    title: 'I am incurable curios about to all things related to design and technology',
+    title: 'I sometimes fall in love with my personas',
     quantifiers: {
       'Technology-Loving': 10,
       'Designer': 0,
@@ -136,7 +136,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I have an healthy obsession for details',
+    title: 'I like to share my knowledge, even offtopic',
     quantifiers: {
       'Motivated': 2,
       'Visual': 5,
@@ -147,7 +147,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I design interactions from a user\'s perspective',
+    title: 'I\'m an app store shopaholic',
     quantifiers: {
       'UX': 10,
       'UI': 9,
@@ -155,14 +155,14 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I work in an oh so agile way',
+    title: 'I can spend a whole day optimizing at zoom level 3200%',
     quantifiers: {
       'Open-Minded': 6,
       'Motivated': 4
     }
   },
   {
-    title: 'I am comfortable using version control, preferably Git',
+    title: 'My favorite travels are customer journeys',
     quantifiers: {
       'Technology-Loving': 3,
       'Design Engineer': 7,
@@ -171,7 +171,7 @@ window.PositionFinderData = {
     }
   },
   {
-    title: 'I am curious and open to learn new things and tools',
+    title: 'Web Inspector is my co-pilot, when browsing the web',
     quantifiers: {
       'Motivated': 7,
       'Open-Minded': 8,
@@ -179,7 +179,98 @@ window.PositionFinderData = {
     }
   },
   {
+    title: 'Teamwork is better than homework',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'Prototyping is da real sh**',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I have the experience and ability to lead a project',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I dream in userflows',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I read more code than books',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I create interfaces for large HDTVs, tiny mobile phones and everything in between',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I share my own ideas and opinion on the web',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I love to change established workflows',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I tweak my dropshadows in CSS3, not photoshop',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I have a strong understanding of web development',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
     title: 'I am comfortable presenting to clients',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I think, Design Thinking is a cliché',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'They call me Strategenius!',
+    quantifiers: {
+      'Lead': 6,
+      'Senior-level': 5
+    }
+  },
+  {
+    title: 'I can see the big picture outside my canvas',
     quantifiers: {
       'Lead': 6,
       'Senior-level': 5
