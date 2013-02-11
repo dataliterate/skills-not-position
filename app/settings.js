@@ -7,6 +7,7 @@ var Settings = function() {
 
 _.extend(Settings.prototype, {
   N_STATEMENTS: 12,
+  SETUP: false,
   initialize: function() {
     
   }

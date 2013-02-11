@@ -5,6 +5,7 @@ var _ =  require('underscore')
   , IndicatorView = require('./indicator_view')
   , SkillView = require('./skill_view')
   , SetupView = require('./setup_view')
+  , Settings = require('../settings')
 
   , MainView
   ;
@@ -67,7 +68,10 @@ module.exports = MainView = Backbone.View.extend({
           $('img#input-' + inputOption).addClass('disabled');
         }
       });
-      //this.setupView();
+      if(Setting.SETUP) {
+        this.setupView();
+      }
+      
     },
     eventLog: {},
     changeScore: function(score) {
