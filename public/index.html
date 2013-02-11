@@ -2,11 +2,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-  <title>Design Position Generator</title>
+  <title>#designposition</title>
   
   <script src="position-finder-data.js"></script>
   <script src="position-finder.min.js"></script>
   <link rel="stylesheet" href="styles.min.css" type="text/css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <meta property="og:image" content="designposition.png">
+  <meta property="og:title" content="#designposition - Find your perfect design position">
 </head>
 <body class="teaser-open">
   <div id="teaser">
@@ -78,9 +81,15 @@
 </div>
 </script>
 <script type="text/template" id="setup-tmpl">
+<div class="content">
 <h2>Setup</h2>
 <ul>
 </ul>
+</div>
+<div class="submit">
+  <button id="setup-export">Export</button>
+  <textarea id="setup-export-output"></textarea>
+</div>
 </script>
 <script type="text/template" id="setup-skill-tmpl">
 <div class="<%= skillid %>">
