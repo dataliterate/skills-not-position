@@ -8,21 +8,21 @@ var Data = function() {
 _.extend(Data.prototype, {
   initialize: function() {
     if(!window.PositionFinderData) {
-      console.error("Could not find PositionFinderData");
+      window.console.error("Could not find PositionFinderData");
     }
   },
   words: function() {
     if(window.PositionFinderData.words) {
       return window.PositionFinderData.words;
     }
-    console.error("Could not find PositionFinderData.words");
+    window.console.error("Could not find PositionFinderData.words");
   },
   skills: function() {
     if(window.PositionFinderData.skills) {
       return window.PositionFinderData.skills;
     }
-    console.error("Could not find PositionFinderData.skills");
-  },
+    window.console.error("Could not find PositionFinderData.skills");
+  }
 });
 
 var SingletonData = new Data();

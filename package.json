@@ -25,6 +25,7 @@
     "grunt-yui-compressor": "~0.1.1",
     "grunt-contrib-jshint": "~0.1.0",
     "grunt-jslint": "~0.2.5",
-    "grunt-replace": "~0.3.2"
+    "grunt-replace": "~0.3.2",
+    "grunt-clean": "~0.4.0"
   }
 }

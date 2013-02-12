@@ -28,7 +28,7 @@ $(function() {
   });
 
   _.templateSettings = {
-    interpolate : /\{\{(.+?)\}\}/g
+    interpolate : /[\{\{(.+?)\}\}]/g
   };
 
   _.delay(function() {

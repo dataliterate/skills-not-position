@@ -37,7 +37,7 @@ module.exports = SetupSkillView = Backbone.View.extend({
           html += '<label>' + word.get('title') + '</label>';
           html += '<input name="' + word.get('title') + '" type="range" min="0" max="10" step="1" value="' + value + '"><br />';
           html += '</div>';
-        })
+        });
         html += '</div>';
       });
       return html;
@@ -46,7 +46,7 @@ module.exports = SetupSkillView = Backbone.View.extend({
       var quantifiers = this.model.get('quantifiers');
       var v = 0;
       _.each(quantifiers, function(q) {
-        if(q[0].get('title') == word.get('title')) {
+        if(q[0].get('title') === word.get('title')) {
           v = q[1];
         }
       });
@@ -58,7 +58,7 @@ module.exports = SetupSkillView = Backbone.View.extend({
       var v = 0;
       var set = false;
       _.each(quantifiers, function(q) {
-        if(q[0].get('title') == word) {
+        if(q[0].get('title') === word) {
           q[1] = score;
           set = true;
         }

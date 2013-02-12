@@ -154,7 +154,7 @@ module.exports = InputElement = Backbone.View.extend({
         this.trigger('change', num);
       }, this);
 
-      if(e.keyCode == 229) {
+      if(e.keyCode === 229) {
         // fix chrome android bug:
         _.delay(function() {
           var input = $('#ios-keyboard').val();
@@ -162,7 +162,7 @@ module.exports = InputElement = Backbone.View.extend({
             return;
           }
           var keyCode = input.charCodeAt(0);
-          if(input == "\n") {
+          if(input === "\n") {
             keyCode = 13;
           }
           $('#ios-keyboard').val('');

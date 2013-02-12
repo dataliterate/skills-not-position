@@ -9,16 +9,24 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-yui-compressor');
   grunt.loadNpmTasks('grunt-jslint');
   grunt.loadNpmTasks('grunt-replace');
+  grunt.loadNpmTasks('grunt-clean');
 
   // Project configuration.
   grunt.initConfig({
     settings: grunt.file.readJSON('settings.json'),
+    clean: {
+      tmp: "tmp",
+      buildProduction: "build/production",
+      buildDev: "build/dev"
+    },
     replace: {
-      dist: {
+      production: {
         // next time: real template system for HTML
         options: {
           variables: {
             'title-->': '<%= settings.title %>',
+            'head-->': grunt.file.read("templates/common/production-head.tmpl"),
+            'livereload-->': '',
             'longtitle-->': '<%= settings.longtitle %>',
             'google-tracking-->': grunt.file.read("templates/custom/google-tracking.tmpl"),
             'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
@@ -28,7 +36,26 @@ module.exports = function(grunt) {
           prefix: '<!--@@'
         },
         files: {
-          'public/index.html': ['public/index.html']
+          'build/production/index.html': ['build/production/index.html']
+        }
+      },
+      development: {
+        // next time: real template system for HTML
+        options: {
+          variables: {
+            'title-->': '<%= settings.title %>',
+            'head-->': grunt.file.read("templates/common/dev-head.tmpl"),
+            'livereload-->': grunt.file.read("templates/common/dev-livereload.tmpl"),
+            'longtitle-->': '<%= settings.longtitle %>',
+            'google-tracking-->': grunt.file.read("templates/custom/google-tracking.tmpl"),
+            'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
+            'share-twitter-->': grunt.file.read("templates/custom/share-twitter.tmpl"),
+            'share-facebook-->': grunt.file.read("templates/custom/share-facebook.tmpl")
+          },
+          prefix: '<!--@@'
+        },
+        files: {
+          'build/development/index.html': ['build/development/index.html']
         }
       }
     },
@@ -44,24 +71,38 @@ module.exports = function(grunt) {
         vars: true,
         plusplus: true,
         predef: [ // array of pre-defined globals
-          'require', 'module', 'Modernizr'
+          'require', 'module', 'Modernizr', '_gaq'
         ]
       },
       options: {
       }
     },
     copy: {
-      main: {
+      production: {
         files: [
-          {src: ['svgs/stack/stack.svg'], dest: 'public/assets/stack.svg', filter: 'isFile'},
-          {src: ['templates/index.html'], dest: 'public/index.html', filter: 'isFile'}
+          {src: ['svgs/stack/stack.svg'], dest: 'build/production/assets/stack.svg', filter: 'isFile'},
+          {src: ['svgs/stack/stack.svg'], dest: 'build/production/assets/stack.svg', filter: 'isFile'},
+          {src: ['templates/index.html'], dest: 'build/production/index.html', filter: 'isFile'},
+          {src: ['public/*'], dest: 'build/production/'},
+          {src: ['tmp/position-finder.min.js'], dest: 'build/production/position-finder.min.js'},
+          {src: ['tmp/styles.min.css'], dest: 'build/production/styles.min.css'}
+        ]
+      },
+      development: {
+        files: [
+          {src: ['svgs/stack/stack.svg'], dest: 'build/development/assets/stack.svg', filter: 'isFile'},
+          {src: ['svgs/stack/stack.svg'], dest: 'build/development/assets/stack.svg', filter: 'isFile'},
+          {src: ['templates/index.html'], dest: 'build/development/index.html', filter: 'isFile'},
+          {src: ['public/*'], dest: 'build/development/'},
+          {src: ['tmp/*.js'], dest: 'build/development/'},
+          {src: ['tmp/*.css'], dest: 'build/development/'}
         ]
       }
     },
     less: {
       all: {
         src: 'less/*.less',
-        dest: 'public/styles.css',
+        dest: 'tmp/styles.css',
         options: {
           compress: true
         }
@@ -70,15 +111,15 @@ module.exports = function(grunt) {
     concat: {
       lib: {
         src: ['lib/fixsvgstack.jquery.js', 'lib/html5slider.js', 'lib/keyboard.js', 'lib/modernizr.js', 'lib/tipsy.js'],
-        dest: 'public/lib.js'
+        dest: 'tmp/lib.js'
       },
       css: {
-        src: ['public/styles.css', 'lib/tipsy.css'],
-        dest: 'public/styles.css'
+        src: ['tmp/styles.css', 'lib/tipsy.css'],
+        dest: 'tmp/styles.css'
       }
     },
     browserify: {
-      './public/app.js': {
+      'tmp/app.js': {
         entries: ['./app/app.js'],
         aliases : ['jquery:jquery-browserify'] 
       }
@@ -86,14 +127,14 @@ module.exports = function(grunt) {
     mincss: {
       compress: {
         files: {
-          "public/styles.min.css": ["public/styles.css"]
+          "tmp/styles.min.css": ["tmp/styles.css"]
         }
       }
     },
     min: {
       'dist': {
-        'src': ['public/app.js', 'public/lib.js'],
-        'dest': 'public/position-finder.min.js'
+        'src': ['tmp/app.js', 'tmp/lib.js'],
+        'dest': 'tmp/position-finder.min.js'
       }
     },
     reload: {
@@ -111,8 +152,9 @@ module.exports = function(grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', 'lint jshint concat min');
-  grunt.registerTask('build', 'browserify less concat copy replace reload mincss min');
-  grunt.registerTask('build:dev', 'browserify less concat copy replace');
-  grunt.registerTask('build:template', 'copy replace');
+  grunt.registerTask('default', 'build');
+  grunt.registerTask('build', 'clean browserify less concat mincss min copy:production replace:production');
+  grunt.registerTask('build:dev', 'jslint clean browserify less concat copy:development replace:development');
+  grunt.registerTask('build:template', 'copy:production replace:production');
+  grunt.registerTask('watch', 'watch build:dev reload');
 };

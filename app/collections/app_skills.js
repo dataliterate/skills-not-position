@@ -1,7 +1,7 @@
 var _ =  require('underscore')
   , Backbone = require('backbone')
   , AppWords = require('./app_words')
-  , data = require('../data').skills();
+  , data = require('../data').skills()
   ;
 
 var Skills = Backbone.Collection.extend({
@@ -20,7 +20,6 @@ var Skills = Backbone.Collection.extend({
     });
     e = e.substr(0, e.length - 2) + "\n";
     e += ']';
-    console.log(e);
     return e;
   },
   getScores: function() {

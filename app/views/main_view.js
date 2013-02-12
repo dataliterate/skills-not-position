@@ -112,7 +112,7 @@ module.exports = MainView = Backbone.View.extend({
     },
     skillChange: function(e) {
       var currentSkill = this.model.currentSkill();
-      if(currentSkill == null) {
+      if(currentSkill === null) {
         return;
       }
       this.statementLayout();
@@ -142,7 +142,7 @@ module.exports = MainView = Backbone.View.extend({
         }
       }, this);
 
-      if(oldh != null) {
+      if(oldh !== null) {
         var h = $('#skill').height();
         $('#skill').css('height', oldh + 'px');
         $('#scores').addClass('flash').show();
@@ -224,13 +224,13 @@ module.exports = MainView = Backbone.View.extend({
         query += '&p[images][0]=' + window.escape(url + 'positionfinder.png');
         query += '&p[summary]=' + window.escape(text);
         query += '&p[url]=' + window.escape(window.location.href.replace(window.location.hash, ''));
-        var url = "http://www.facebook.com/sharer/sharer.php?s=100&" + query;
-        window.open(url, "facebook", "status=1, height=500, width=360, resizable=0");
+        var shareUrl = "http://www.facebook.com/sharer/sharer.php?s=100&" + query;
+        window.open(shareUrl, "facebook", "status=1, height=500, width=360, resizable=0");
       });
     },
     currentLayout: null,
     positionLayout: function() {
-      if(this.currentLayout == 'position') {
+      if(this.currentLayout === 'position') {
         return;
       }
       this.currentLayout = 'position';
@@ -243,7 +243,7 @@ module.exports = MainView = Backbone.View.extend({
     },
     statementLayout: function() {
 
-      if(this.currentLayout == 'statement') {
+      if(this.currentLayout === 'statement') {
         return;
       }
       this.currentLayout = 'statement';

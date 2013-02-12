@@ -2,7 +2,7 @@ var _ =  require('underscore')
   , Backbone = require('backbone')
   , Settings = require('../settings')
   , Word = require('../models/word')
-  , data = require('../data').words();
+  , data = require('../data').words()
   ;
 
 var Words = Backbone.Collection.extend({
