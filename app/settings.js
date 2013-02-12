@@ -8,7 +8,7 @@ var Settings = function() {
 _.extend(Settings.prototype, {
   N_STATEMENTS: 2,
   SETUP: (window.location.search.indexOf('setup') !== -1),
-  TRACK: (true && window._gaq),
+  TRACK: (window._gaq),
   initialize: function() {
     
   }
