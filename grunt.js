@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     },
     less: {
       all: {
-        src: '*.less',
+        src: 'less/*.less',
         dest: 'public/styles.css',
         options: {
           compress: true
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
       }
     },
     watch:{
-      files:['app/**/*', './styles.less'],
+      files:['lib/*', 'app/**/*', './styles.less'],
       tasks:['build']
     },
     all: ['app/**/*.js']

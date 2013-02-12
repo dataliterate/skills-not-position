@@ -17,7 +17,6 @@ var Router = Backbone.Router.extend({
     this.startSession();
   },
   statement: function(i) {
-    console.log("ASS");
     if(!this.hasSession()) {
       this.navigate('', {trigger: true});
       return;
@@ -29,10 +28,16 @@ var Router = Backbone.Router.extend({
     this.session.set({'skillPos': i, 'analysed': false});
   },
   position: function() {
+    
     if(!this.hasSession()) {
       this.navigate('');
       return;
     }
+    
+    //if(!this.hasSession()) {
+    //  this.startSession();
+    //}
+    this.navigate('position', {trigger: true});
     this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },

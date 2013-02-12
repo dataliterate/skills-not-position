@@ -169,7 +169,7 @@ module.exports = InputElement = Backbone.View.extend({
           processKey(keyCode);
         }, 50);
       } else {
-        e.preventDefault();
+        //e.preventDefault();
         processKey(e.keyCode);
       }
 
@@ -203,11 +203,14 @@ module.exports = InputElement = Backbone.View.extend({
       $('.indicator-wrapper').css('width', this.value + '%');
       this.$scorer.val(this.value);
 
-      if(this.value > 50) {
-        $('.fader').css('background', 'RGBA(255, 255, 255, ' + ((this.value - 50) / 100) / 2 + ')');
-      } else {
-        $('.fader').css('background', 'RGBA(0, 0, 0, ' + ((50 - this.value) / 100) / 5 + ')');
-      }
+
+      var middle = 187;
+      var range = 30;
+      var base = middle - range / 2;
+      
+      var gray = Math.floor(base + this.value / 100 * range);
+
+      $('body').css('background', 'RGB(' + gray + ', '+ gray + ', ' + gray + ')');
       
     },
     set: function(v) {

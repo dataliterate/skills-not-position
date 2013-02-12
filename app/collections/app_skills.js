@@ -22,6 +22,16 @@ var Skills = Backbone.Collection.extend({
     e += ']';
     console.log(e);
     return e;
+  },
+  getScores: function() {
+    var e = '';
+    this.each(function(skill) {
+      if(!skill.get('completed')) {
+        return;
+      }
+      e += '    (' + skill.get('score') + '/100) ' + skill.get('title') + "\n";
+    });
+    return e;
   }
 });
 

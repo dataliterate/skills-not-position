@@ -106,9 +106,9 @@ module.exports = Session = Backbone.Model.extend({
         case 'avg':
           return 'Average Designer';
         case '100':
-          return '100% Designer';
+          return 'Highscore Hero';
         case '0':
-          return 'No-Design Designer';
+          return 'Tax Accountant';
       }
     }
 
@@ -142,7 +142,7 @@ module.exports = Session = Backbone.Model.extend({
     }
     title += ' ' + _.first(grouped.level).get('title');
     title += ' ' + grouped.field[0].get('title');
-    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 10) {
+    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 20) {
       title += ' & ' + grouped.field[1].get('title');
     }
     title += ' ' + _.first(grouped.title).get('title');

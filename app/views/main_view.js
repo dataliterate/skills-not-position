@@ -47,15 +47,7 @@ module.exports = MainView = Backbone.View.extend({
         $('body').removeClass('teaser-open');
       });
       if(!Modernizr.svganchors) {
-        $('img.svg').fixSVGStack();
-      }
-      if(Modernizr.touch) {
-        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
-        $('#input-keyboard').mouseup(function() {
-          $('#ios-keyboard').focus();
-        });
-      } else {
-        $('.input-options img').tipsy({gravity: 's'});
+        $('.svg').fixSVGStack();
       }
       // feature detection:
       var inputOptions = {
@@ -65,10 +57,19 @@ module.exports = MainView = Backbone.View.extend({
       };
       _.each(inputOptions, function(enabled, inputOption) {
         if(!enabled) {
-          $('img#input-' + inputOption).addClass('disabled');
+          $('img#input-' + inputOption).addClass('disabled').attr('title', $('img#input-' + inputOption).data('titledisabled'));
+          //$('img#input-' + inputOption).attr('title', $('img#input-' + inputOption).data('titleDisabled'));
         }
       });
-      if(Setting.SETUP) {
+      if(Modernizr.touch) {
+        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
+        $('#input-keyboard').mouseup(function() {
+          $('#ios-keyboard').focus();
+        });
+      } else {
+        $('.input-options img').tipsy({gravity: 's'});
+      }
+      if(Settings.SETUP) {
         this.setupView();
       }
       
@@ -93,7 +94,7 @@ module.exports = MainView = Backbone.View.extend({
     submitScore: function() {
       //if last skill saved
       this.model.currentSkill().set({completed: true});
-
+      _gaq.push(['_trackEvent', 'Statement', 'rated', this.model.currentSkill().get('title'), this.model.currentSkill().get('score')]);
       if(!this.model.hasNext()) {
         this.router.gotoPosition();
         return;
@@ -169,23 +170,47 @@ module.exports = MainView = Backbone.View.extend({
     },
     showPosition: function() {
       var position = this.model.getPosition();
+      _gaq.push(['_trackEvent', 'Position', 'generated', position]);
       var html = this.resultTemplate({position: position});
       $('#position').html(html);
       this.positionLayout();
 
       $('button.twitter').click(function(e) {
-
+        _gaq.push(['_trackEvent', 'Social', 'twitter-shared']);
         var text = "My #designposition: " + position;
-        text += " http://bit.ly/design-positions";
+        text += " - What's yours? http://bit.ly/design-positions";
         var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
-        window.location.href = url;
-        
+        window.open(url, "twitter", "status=1, height=500, width=360, resizable=0");
+      });
+
+      $('button#apply').click(_.bind(function(e) {
+        _gaq.push(['_trackEvent', 'Conversion', 'applied']);
+        e.preventDefault();
+        // create email link
+        var mailto = 'mailto:jobs@precious-forever.com';
+        mailto += '?subject=' + window.escape('Application as ' + position);
+        var text = 'Dear precious,' + "\n" + "\n";
+        text += '[x] here is the URL to my work samples:' + "\n" + "\n";
+        text += '[x] I\'ve attached my CV' + "\n" + "\n";
+        text += '[ ] Here is a link to my CV' + "\n" + "\n" + "\n" + "\n";
+        text += '[x] This is how I rated the statements, which lead to my #designposition' + "\n";
+        text += this.model.skills.getScores();
+
+        mailto += '&body=' + window.escape(text);
+        window.location.href = mailto;
+
+      }, this));
+
+      $('.learn-more').click(function(e) {
+        _gaq.push(['_trackEvent', 'Conversion', 'learned']);
       });
 
       $('button.facebook').click(function(e) {
+        _gaq.push(['_trackEvent', 'Social', 'facebook-shared']);
         var text = "My #designposition: " + position;
         var url = "http://www.facebook.com/sharer/sharer.php?u=" + window.escape('http://bit.ly/design-positions') + "&t=" + window.escape(text);
-        window.location.href = url;
+        //window.location.href = url;
+        window.open(url, "facebook", "status=1, height=500, width=360, resizable=0");
       });
     },
     currentLayout: null,
@@ -194,7 +219,7 @@ module.exports = MainView = Backbone.View.extend({
         return;
       }
       this.currentLayout = 'position';
-      $('body').addClass('position').removeClass('statement');
+      $('body').addClass('position').removeClass('statement').css('background-color', '#FFF');
 
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();

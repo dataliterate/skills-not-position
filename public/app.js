@@ -13717,7 +13717,6 @@ var Router = Backbone.Router.extend({
     this.startSession();
   },
   statement: function(i) {
-    console.log("ASS");
     if(!this.hasSession()) {
       this.navigate('', {trigger: true});
       return;
@@ -13729,10 +13728,16 @@ var Router = Backbone.Router.extend({
     this.session.set({'skillPos': i, 'analysed': false});
   },
   position: function() {
+    
     if(!this.hasSession()) {
       this.navigate('');
       return;
     }
+    
+    //if(!this.hasSession()) {
+    //  this.startSession();
+    //}
+    this.navigate('position', {trigger: true});
     this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },
@@ -13770,7 +13775,8 @@ var Settings = function() {
 };
 
 _.extend(Settings.prototype, {
-  N_STATEMENTS: 12,
+  N_STATEMENTS: 8,
+  SETUP: false,
   initialize: function() {
     
   }
@@ -13888,9 +13894,9 @@ module.exports = Session = Backbone.Model.extend({
         case 'avg':
           return 'Average Designer';
         case '100':
-          return '100% Designer';
+          return 'Highscore Hero';
         case '0':
-          return 'No-Design Designer';
+          return 'Tax Accountant';
       }
     }
 
@@ -13924,7 +13930,7 @@ module.exports = Session = Backbone.Model.extend({
     }
     title += ' ' + _.first(grouped.level).get('title');
     title += ' ' + grouped.field[0].get('title');
-    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 10) {
+    if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 20) {
       title += ' & ' + grouped.field[1].get('title');
     }
     title += ' ' + _.first(grouped.title).get('title');
@@ -14064,23 +14070,35 @@ var Skills = Backbone.Collection.extend({
     var e = '[';
     this.each(function(skill) {
       e += "{\n";
-      e += "  title: '" + skill.get('title') + "',\n";
-      e += "  quantifiers: [\n";
+      e += "  title: '" + skill.get('title').replace(/'/g, "\\'") + "',\n";
+      e += "  quantifiers: {\n";
       _.each(skill.get('quantifiers'), function(q) {
-        e += "    w('" + q[0].get('title') + "', " + q[1] + "),\n";
+        e += "    '" + q[0].get('title').replace(/'/g, "\\'") + "': " + q[1] + ",\n";
       });
       e = e.substr(0, e.length - 2) + "\n";
-      e += "  ]\n";
+      e += "  }\n";
       e += "},\n";
     });
     e = e.substr(0, e.length - 2) + "\n";
     e += ']';
+    console.log(e);
+    return e;
+  },
+  getScores: function() {
+    var e = '';
+    this.each(function(skill) {
+      if(!skill.get('completed')) {
+        return;
+      }
+      e += '    (' + skill.get('score') + '/100) ' + skill.get('title') + "\n";
+    });
+    return e;
   }
 });
 
 function w(title, quotient) {
-  if(!AppWords.getByTitle(title)) {
-    return;
+  if(!AppWords.getByTitle(title).length) {
+    return false;
   }
   return [AppWords.getByTitle(title)[0], quotient];
 }
@@ -14091,195 +14109,16 @@ _.each(data, function(skillData) {
   var skill = {};
   skill.title = skillData.title;
   skill.quantifiers = [];
-  _.each(skill.quantifiers, function(value, word) {
-    skill.quantifiers.push(w(word, value));
+  _.each(skillData.quantifiers, function(value, word) {
+    var resolved = w(word, value);
+    if(resolved !== false) {
+      skill.quantifiers.push(w(word, value));
+    }
   });
   skills.push(skill);
 });
 
 module.exports = Skills = new Skills(_.shuffle(skills));
-
-/*
-module.exports = Skills = new Skills(_.shuffle([
-{
-  title: 'I am an experienced (4+) visual designer',
-  quantifiers: [
-    w('Experienced', 9),
-    w('Visual', 10),
-    w('Designer', 10),
-    w('Senior-level', 4)
-  ]
-},
-{
-  title: 'I have the experience and ability to lead a project',
-  quantifiers: [
-    w('Lead', 10),
-    w('Senior-level', 5),
-    w('Head of', 2)
-  ]
-},
-{
-  title: 'I am able to develop visual languages, from idea to product',
-  quantifiers: [
-    w('Visual', 10),
-    w('Digital Product', 10),
-    w('Designer', 8),
-    w('Experienced', 2),
-    w('Senior-level', 3)
-  ]
-},
-{
-  title: 'I create interfaces for large HDTVs, tiny mobile phones and everything in between',
-  quantifiers: [
-    w('Visual', 7),
-    w('UI', 10),
-    w('Multiscreen', 10),
-    w('Innovative', 5),
-    w('Designer', 2)
-  ]
-},
-{
-  title: 'I share my own ideas and opinion on the web',
-  quantifiers: [
-    w('Design Evanglist', 7),
-    w('Open-minded', 10),
-    w('Reflecting', 7),
-    w('Motivated', 2)
-  ]
-},
-{
-  title: 'I have a passion for interactive design',
-  quantifiers: [
-    w('UI', 0),
-    w('Designer', 10),
-    w('IxD', 10),
-    w('UX', 2),
-    w('Motivated', 5)
-  ]
-},
-{
-  title: 'I reflect, rethink and improve my design workflow',
-  quantifiers: [
-    w('Innovative', 10),
-    w('Technology-Loving', 0),
-    w('Design Evanglist', 9),
-    w('Reflecting', 6),
-    w('Critical', 3)
-  ]
-},
-{
-  title: 'I experiment with CSS3 to create stunning visual results',
-  quantifiers: [
-    w('Frontend', 10),
-    w('Technology-Loving', 8),
-    w('Innovative', 6),
-    w('Creative Coder', 6),
-    w('Designer', 8),
-    w('Visual', 9)
-  ]
-},
-{
-  title: 'I have a strong understanding of web development',
-  quantifiers: [
-    w('Frontend', 10),
-    w('Design Architect', 8),
-    w('Design Engineer', 9),
-    w('Technology-Loving', 7),
-    w('Experienced', 3),
-    w('Senior-level', 3)
-  ]
-},
-{
-  title: 'I have natural mentoring instincts to lead and care for fellow team members',
-  quantifiers: [
-    w('Lead', 10),
-    w('Design Evanglist', 10),
-    w('Designer', 2),
-    w('Design Architect', 2),
-    w('Enthusiastic', 2)
-  ]
-},
-{
-  title: 'I have the willingness to share my knowledge',
-  quantifiers: [
-    w('Open-Minded', 10),
-    w('Design Evanglist', 2)
-  ]
-},
-{
-  title: 'I have impressive skills in visual storytelling, ideation and sketching',
-  quantifiers: [
-    w('Designer', 6),
-    w('UX', 8),
-    w('Digital Product', 6)
-  ]
-},
-{
-  title: 'I love teamwork and brainstorming sessions',
-  quantifiers: [
-    w('Open-minded', 10)
-  ]
-},
-{
-  title: 'I am incurable curios about to all things related to design and technology',
-  quantifiers: [
-    w('Technology-Loving', 10),
-    w('Designer', 0),
-    w('Enthusiastic', 2)
-  ]
-},
-{
-  title: 'I have an healthy obsession for details',
-  quantifiers: [
-    w('Motivated', 2),
-    w('Visual', 5),
-    w('UI', 2),
-    w('Frontend', 1),
-    w('Designer', 2),
-    w('Creative Coder', 0)
-  ]
-},
-{
-  title: 'I design interactions from a user\'s perspective',
-  quantifiers: [
-    w('UX', 10),
-    w('UI', 9),
-    w('Designer', 10)
-  ]
-},
-{
-  title: 'I work in an oh so agile way',
-  quantifiers: [
-    w('Open-Minded', 6),
-    w('Motivated', 4)
-  ]
-},
-{
-  title: 'I am comfortable using version control, preferably Git',
-  quantifiers: [
-    w('Technology-Loving', 3),
-    w('Design Engineer', 7),
-    w('Creative Coder', 8),
-    w('Frontend', 5)
-  ]
-},
-{
-  title: 'I am curious and open to learn new things and tools',
-  quantifiers: [
-    w('Motivated', 7),
-    w('Open-Minded', 8),
-    w('Designer', 0)
-  ]
-},
-{
-  title: 'I am comfortable presenting to clients',
-  quantifiers: [
-    w('Lead', 6),
-    w('Senior-level', 5)
-  ]
-}
-]));
-*/
 });
 
 require.define("/app/views/main_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
@@ -14289,6 +14128,7 @@ require.define("/app/views/main_view.js",function(require,module,exports,__dirna
   , IndicatorView = require('./indicator_view')
   , SkillView = require('./skill_view')
   , SetupView = require('./setup_view')
+  , Settings = require('../settings')
 
   , MainView
   ;
@@ -14330,15 +14170,7 @@ module.exports = MainView = Backbone.View.extend({
         $('body').removeClass('teaser-open');
       });
       if(!Modernizr.svganchors) {
-        $('img.svg').fixSVGStack();
-      }
-      if(Modernizr.touch) {
-        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
-        $('#input-keyboard').mouseup(function() {
-          $('#ios-keyboard').focus();
-        });
-      } else {
-        $('.input-options img').tipsy({gravity: 's'});
+        $('.svg').fixSVGStack();
       }
       // feature detection:
       var inputOptions = {
@@ -14348,10 +14180,22 @@ module.exports = MainView = Backbone.View.extend({
       };
       _.each(inputOptions, function(enabled, inputOption) {
         if(!enabled) {
-          $('img#input-' + inputOption).addClass('disabled');
+          $('img#input-' + inputOption).addClass('disabled').attr('title', $('img#input-' + inputOption).data('titledisabled'));
+          //$('img#input-' + inputOption).attr('title', $('img#input-' + inputOption).data('titleDisabled'));
         }
       });
-      //this.setupView();
+      if(Modernizr.touch) {
+        $('.input-options img:not(#input-keyboard)').tipsy({gravity: 's'});
+        $('#input-keyboard').mouseup(function() {
+          $('#ios-keyboard').focus();
+        });
+      } else {
+        $('.input-options img').tipsy({gravity: 's'});
+      }
+      if(Settings.SETUP) {
+        this.setupView();
+      }
+      
     },
     eventLog: {},
     changeScore: function(score) {
@@ -14373,7 +14217,7 @@ module.exports = MainView = Backbone.View.extend({
     submitScore: function() {
       //if last skill saved
       this.model.currentSkill().set({completed: true});
-
+      _gaq.push(['_trackEvent', 'Statement', 'rated', this.model.currentSkill().get('title'), this.model.currentSkill().get('score')]);
       if(!this.model.hasNext()) {
         this.router.gotoPosition();
         return;
@@ -14449,23 +14293,47 @@ module.exports = MainView = Backbone.View.extend({
     },
     showPosition: function() {
       var position = this.model.getPosition();
+      _gaq.push(['_trackEvent', 'Position', 'generated', position]);
       var html = this.resultTemplate({position: position});
       $('#position').html(html);
       this.positionLayout();
 
       $('button.twitter').click(function(e) {
-
+        _gaq.push(['_trackEvent', 'Social', 'twitter-shared']);
         var text = "My #designposition: " + position;
-        text += " http://bit.ly/design-positions";
+        text += " - What's yours? http://bit.ly/design-positions";
         var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
-        window.location.href = url;
-        
+        window.open(url, "twitter", "status=1, height=500, width=360, resizable=0");
+      });
+
+      $('button#apply').click(_.bind(function(e) {
+        _gaq.push(['_trackEvent', 'Conversion', 'applied']);
+        e.preventDefault();
+        // create email link
+        var mailto = 'mailto:jobs@precious-forever.com';
+        mailto += '?subject=' + window.escape('Application as ' + position);
+        var text = 'Dear precious,' + "\n" + "\n";
+        text += '[x] here is the URL to my work samples:' + "\n" + "\n";
+        text += '[x] I\'ve attached my CV' + "\n" + "\n";
+        text += '[ ] Here is a link to my CV' + "\n" + "\n" + "\n" + "\n";
+        text += '[x] This is how I rated the statements, which lead to my #designposition' + "\n";
+        text += this.model.skills.getScores();
+
+        mailto += '&body=' + window.escape(text);
+        window.location.href = mailto;
+
+      }, this));
+
+      $('.learn-more').click(function(e) {
+        _gaq.push(['_trackEvent', 'Conversion', 'learned']);
       });
 
       $('button.facebook').click(function(e) {
+        _gaq.push(['_trackEvent', 'Social', 'facebook-shared']);
         var text = "My #designposition: " + position;
         var url = "http://www.facebook.com/sharer/sharer.php?u=" + window.escape('http://bit.ly/design-positions') + "&t=" + window.escape(text);
-        window.location.href = url;
+        //window.location.href = url;
+        window.open(url, "facebook", "status=1, height=500, width=360, resizable=0");
       });
     },
     currentLayout: null,
@@ -14474,7 +14342,7 @@ module.exports = MainView = Backbone.View.extend({
         return;
       }
       this.currentLayout = 'position';
-      $('body').addClass('position').removeClass('statement');
+      $('body').addClass('position').removeClass('statement').css('background-color', '#FFF');
 
       if(!Modernizr.svganchors) {
         $('header h1').fixSVGStackBackground();
@@ -14673,7 +14541,7 @@ module.exports = InputElement = Backbone.View.extend({
           processKey(keyCode);
         }, 50);
       } else {
-        e.preventDefault();
+        //e.preventDefault();
         processKey(e.keyCode);
       }
 
@@ -14707,11 +14575,14 @@ module.exports = InputElement = Backbone.View.extend({
       $('.indicator-wrapper').css('width', this.value + '%');
       this.$scorer.val(this.value);
 
-      if(this.value > 50) {
-        $('.fader').css('background', 'RGBA(255, 255, 255, ' + ((this.value - 50) / 100) / 2 + ')');
-      } else {
-        $('.fader').css('background', 'RGBA(0, 0, 0, ' + ((50 - this.value) / 100) / 5 + ')');
-      }
+
+      var middle = 187;
+      var range = 30;
+      var base = middle - range / 2;
+      
+      var gray = Math.floor(base + this.value / 100 * range);
+
+      $('body').css('background', 'RGB(' + gray + ', '+ gray + ', ' + gray + ')');
       
     },
     set: function(v) {
@@ -14781,7 +14652,7 @@ module.exports = SkillView = Backbone.View.extend({
 require.define("/app/views/setup_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
   , Backbone = require('backbone')
   , $ = require('jquery-browserify')
-  , SetupSkillView// = require('setupskill_view')
+  , SetupSkillView = require('./setup_skill_view')
   , SetupView
   ;
 
@@ -14795,16 +14666,98 @@ module.exports = SetupView = Backbone.View.extend({
     this.$el.html(this.template(this.model.toJSON()));
     this.model.skills.each(_.bind(function(skillModel) {
       var skillSetupView = new SetupSkillView({model: skillModel});
+      skillSetupView.words = this.model.words;
       this.views.push(skillSetupView);
       skillSetupView.render();
       this.$el.find('ul').append(skillSetupView.el);
     }, this));
-    
+    this.$el.find('button').click(_.bind(this.doExport, this));
   },
-  updateScore: function() {
-    this.$el.find('input').val(this.model.get('score'));
+
+  doExport: function() {
+    var text = this.model.skills.doExport();
+    $('#setup-export-output').val(text).show();
   }
 });
+});
+
+require.define("/app/views/setup_skill_view.js",function(require,module,exports,__dirname,__filename,process,global){var _ =  require('underscore')
+  , Backbone = require('backbone')
+  , $ = require('jquery-browserify')
+
+  , SetupSkillView
+  ;
+
+module.exports = SetupSkillView = Backbone.View.extend({
+    template: _.template($('#setup-skill-tmpl').html()),
+    events: {
+      'change input': 'inputChange'
+    },
+    words: null,
+    initialize: function() {
+      
+    },
+    render: function() {
+      this.$el = $('<li></li>');
+      var data = this.model.toJSON();
+      data.skillid = '';
+      data.words = this.getWordsInterface();
+      this.$el.html(this.template(data));
+      this.el = this.$el;
+      this.delegateEvents();
+    },
+    getWordsInterface: function() {
+      // DUCK TAPE PROGRAMMING::
+      var grouped = this.words.getWordsByGroup();
+      var html = '';
+      var that = this;
+      _.each(grouped, function(words, group) {
+        html += '<div class="word-group"><h4>' + group + '</h4>';
+        _.each(words, function(word) {
+          var value = 0;
+          value = that.getQuantifier(word);
+          html += '<div class="input">';
+          html += '<label>' + word.get('title') + '</label>';
+          html += '<input name="' + word.get('title') + '" type="range" min="0" max="10" step="1" value="' + value + '"><br />';
+          html += '</div>';
+        })
+        html += '</div>';
+      });
+      return html;
+    },
+    getQuantifier: function(word) {
+      var quantifiers = this.model.get('quantifiers');
+      var v = 0;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word.get('title')) {
+          v = q[1];
+        }
+      });
+      return v;
+    },
+    setQuantifier: function(word, score) {
+      var quantifiers = this.model.get('quantifiers');
+      var newQuantifiers = [];
+      var v = 0;
+      var set = false;
+      _.each(quantifiers, function(q) {
+        if(q[0].get('title') == word) {
+          q[1] = score;
+          set = true;
+        }
+        newQuantifiers.push([q[0], q[1]]);
+      });
+      if(!set) {
+        newQuantifiers.push([this.words.getByTitle(word)[0], score]);
+      }
+      this.model.set({'quantifiers': newQuantifiers});
+    },
+    inputChange: function(e) {
+      var $input = $(e.currentTarget);
+      var name = $input.attr('name');
+      this.setQuantifier($input.attr('name'), $input.val());
+    }
+  });
 });
 
 require.alias("jquery-browserify", "/node_modules/jquery");
