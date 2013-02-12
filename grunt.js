@@ -48,7 +48,7 @@ module.exports = function(grunt) {
             'head-->': grunt.file.read("templates/common/dev-head.tmpl"),
             'livereload-->': grunt.file.read("templates/common/dev-livereload.tmpl"),
             'longtitle-->': '<%= settings.longtitle %>',
-            'google-tracking-->': grunt.file.read("templates/custom/google-tracking.tmpl"),
+            'google-tracking-->': '',
             'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
             'share-twitter-->': grunt.file.read("templates/custom/share-twitter.tmpl"),
             'share-facebook-->': grunt.file.read("templates/custom/share-facebook.tmpl")
@@ -147,15 +147,15 @@ module.exports = function(grunt) {
     },
     watch:{
       files:['lib/*', 'app/**/*', 'less/**/*', 'templates/**/*'],
-      tasks:['build']
+      tasks:['build:dev', 'reload']
     },
     all: ['app/**/*.js']
   });
 
   // Default task.
   grunt.registerTask('default', 'build');
-  grunt.registerTask('build', 'clean:production browserify less concat mincss min copy:production replace:production clean:tmp');
-  grunt.registerTask('build:dev', 'jslint clean:development browserify less concat copy:development replace:development clean:tmp');
+  grunt.registerTask('build', 'jslint clean:production browserify less concat mincss min copy:production replace:production clean:tmp');
+  grunt.registerTask('build:dev', 'clean:development browserify less concat copy:development replace:development clean:tmp');
   grunt.registerTask('build:template', 'copy:production replace:production');
-  grunt.registerTask('watch', 'watch build:dev reload');
+  
 };
