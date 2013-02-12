@@ -11,34 +11,44 @@ Live
 -----------
 [http://designposition.precious-forever.com](http://designposition.precious-forever.com)
 
-Howto create a custom position generator
+How to create position generator with custom statements
 -----------
 1. Download the project
-2. Copy all files contained in public to your webserver
-3. Edit position-finder-data.js
+2. Copy all files contained in `build/production` to your webserver
+3. Edit position-finder-data.js, edit the words and statements
+4. Open http://[your-url-to-position-finder.com]?setup to adjust quantifiers
 
 
-Install Development Version
+How to really customize the position generator
 -----------
 
-Prerequisites
+1. Prerequisites
 - [Node.js + npm](http://http://nodejs.org/)
 - [grunt 0.3](http://http://gruntjs.com/)
 - [svg-stacker](https://github.com/preciousforever/SVG-Stacker)
 
-Installation
+2. Installation
 ```
 git clone git@github.com:preciousforever/skills-not-position.git
 cd skills-not-position
 npm install
 ```
 
-Build
+3. Customize
+Edit
+- settings.json (Build Configuration)
+- app/settings.js (JS Configuration)
+- templates/common
+- less/styles.less
+
+
+4. Build
 ```
 grunt build
+grunt build:dev
 ```
 
-Development (Watch)
+5. Development (Watch)
 ```
 grunt watch
 ```

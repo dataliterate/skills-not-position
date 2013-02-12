@@ -20,8 +20,9 @@ module.exports = function(grunt) {
       development: "build/dev"
     },
     replace: {
+      // next time: real template system for HTML
+      // (this is ugly by history :)
       production: {
-        // next time: real template system for HTML
         options: {
           variables: {
             'title-->': '<%= settings.title %>',
@@ -153,8 +154,8 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'build');
-  grunt.registerTask('build', 'clean:production browserify less concat mincss min copy:production replace:production');
-  grunt.registerTask('build:dev', 'jslint clean:development browserify less concat copy:development replace:development');
+  grunt.registerTask('build', 'clean:production browserify less concat mincss min copy:production replace:production clean:tmp');
+  grunt.registerTask('build:dev', 'jslint clean:development browserify less concat copy:development replace:development clean:tmp');
   grunt.registerTask('build:template', 'copy:production replace:production');
   grunt.registerTask('watch', 'watch build:dev reload');
 };
