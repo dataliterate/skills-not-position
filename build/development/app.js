@@ -13730,14 +13730,10 @@ var Router = Backbone.Router.extend({
   position: function() {
     
     if(!this.hasSession()) {
-      this.navigate('');
+      this.navigate('', {trigger: true});
       return;
     }
     
-    //if(!this.hasSession()) {
-    //  this.startSession();
-    //}
-    this.navigate('position', {trigger: true});
     this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },
@@ -13777,7 +13773,7 @@ var Settings = function() {
 _.extend(Settings.prototype, {
   N_STATEMENTS: 2,
   SETUP: (window.location.search.indexOf('setup') !== -1),
-  TRACK: true,
+  TRACK: (window._gaq),
   initialize: function() {
     
   }
@@ -14153,7 +14149,6 @@ module.exports = MainView = Backbone.View.extend({
       this.listenTo(this.inputElement, 'change', this.changeScore);
 
       this.listenTo(this.model, 'change:skillPos', this.skillChange);
-      
     },
 
     render: function() {
@@ -14235,7 +14230,7 @@ module.exports = MainView = Backbone.View.extend({
     },
     skillChange: function(e) {
       var currentSkill = this.model.currentSkill();
-      if(currentSkill === null) {
+      if(currentSkill === undefined) {
         return;
       }
       this.statementLayout();
@@ -14807,7 +14802,7 @@ $(function() {
   });
 
   _.templateSettings = {
-    interpolate : /[\{\{(.+?)\}\}]/g
+    interpolate : /\{\{([\w\W]+?)\}\}/g
   };
 
   _.delay(function() {
