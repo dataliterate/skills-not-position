@@ -94,7 +94,9 @@ module.exports = MainView = Backbone.View.extend({
     submitScore: function() {
       //if last skill saved
       this.model.currentSkill().set({completed: true});
-      _gaq.push(['_trackEvent', 'Statement', 'rated', this.model.currentSkill().get('title'), this.model.currentSkill().get('score')]);
+      if(Settings.TRACK) {
+        _gaq.push(['_trackEvent', 'Statement', 'rated', this.model.currentSkill().get('title'), this.model.currentSkill().get('score')]);
+      }
       if(!this.model.hasNext()) {
         this.router.gotoPosition();
         return;
@@ -170,21 +172,26 @@ module.exports = MainView = Backbone.View.extend({
     },
     showPosition: function() {
       var position = this.model.getPosition();
-      _gaq.push(['_trackEvent', 'Position', 'generated', position]);
+      if(Settings.TRACK) {
+        _gaq.push(['_trackEvent', 'Position', 'generated', position]);
+      }
       var html = this.resultTemplate({position: position});
       $('#position').html(html);
       this.positionLayout();
 
       $('button.twitter').click(function(e) {
-        _gaq.push(['_trackEvent', 'Social', 'twitter-shared']);
-        var text = "My #designposition: " + position;
-        text += " - What's yours? http://bit.ly/design-positions";
+        if(Settings.TRACK) {
+          _gaq.push(['_trackEvent', 'Social', 'twitter-shared']);
+        }
+        var text = _.template($('#share-twitter-tmpl').html(), {position: position});
         var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
         window.open(url, "twitter", "status=1, height=500, width=360, resizable=0");
       });
 
       $('button#apply').click(_.bind(function(e) {
-        _gaq.push(['_trackEvent', 'Conversion', 'applied']);
+        if(Settings.TRACK) {
+          _gaq.push(['_trackEvent', 'Conversion', 'applied']);
+        }
         e.preventDefault();
         // create email link
         var mailto = 'mailto:jobs@precious-forever.com';
@@ -202,14 +209,22 @@ module.exports = MainView = Backbone.View.extend({
       }, this));
 
       $('.learn-more').click(function(e) {
-        _gaq.push(['_trackEvent', 'Conversion', 'learned']);
+        if(Settings.TRACK) {
+          _gaq.push(['_trackEvent', 'Conversion', 'learned']);
+        }
       });
 
       $('button.facebook').click(function(e) {
-        _gaq.push(['_trackEvent', 'Social', 'facebook-shared']);
-        var text = "My #designposition: " + position;
-        var url = "http://www.facebook.com/sharer/sharer.php?u=" + window.escape('http://bit.ly/design-positions') + "&t=" + window.escape(text);
-        //window.location.href = url;
+        if(Settings.TRACK) {
+          _gaq.push(['_trackEvent', 'Social', 'facebook-shared']);
+        }
+        var text = _.template($('#share-facebook-tmpl').html(), {position: position});
+        var url = window.location.href.replace(window.location.hash, '');
+        var query = 'p[title]=' + window.escape(window.document.title);
+        query += '&p[images][0]=' + window.escape(url + 'positionfinder.png');
+        query += '&p[summary]=' + window.escape(text);
+        query += '&p[url]=' + window.escape(window.location.href.replace(window.location.hash, ''));
+        var url = "http://www.facebook.com/sharer/sharer.php?s=100&" + query;
         window.open(url, "facebook", "status=1, height=500, width=360, resizable=0");
       });
     },

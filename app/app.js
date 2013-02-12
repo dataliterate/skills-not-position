@@ -27,6 +27,10 @@ $(function() {
     return !(/WebKit/.test(navigator.userAgent));
   });
 
+  _.templateSettings = {
+    interpolate : /\{\{(.+?)\}\}/g
+  };
+
   _.delay(function() {
     window.scrollTo(0, 1);
   }, 1000);

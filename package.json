@@ -1,5 +1,10 @@
 {
   "name": "design-position-finder",
+  "dist": {
+    "name": "precious",
+    "title": "#designposition",
+    "longtitle": "#designposition - find your perfect design position"
+  },
   "version": "0.0.1",
   "engines": {
     "node": ">= 0.6.0"
@@ -19,6 +24,7 @@
     "grunt-contrib-mincss": "~0.3.2",
     "grunt-yui-compressor": "~0.1.1",
     "grunt-contrib-jshint": "~0.1.0",
-    "grunt-jslint": "~0.2.5"
+    "grunt-jslint": "~0.2.5",
+    "grunt-replace": "~0.3.2"
   }
 }

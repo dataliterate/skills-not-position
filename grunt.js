@@ -8,9 +8,30 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-mincss');
   grunt.loadNpmTasks('grunt-yui-compressor');
   grunt.loadNpmTasks('grunt-jslint');
+  grunt.loadNpmTasks('grunt-replace');
 
   // Project configuration.
   grunt.initConfig({
+    settings: grunt.file.readJSON('settings.json'),
+    replace: {
+      dist: {
+        // next time: real template system for HTML
+        options: {
+          variables: {
+            'title-->': '<%= settings.title %>',
+            'longtitle-->': '<%= settings.longtitle %>',
+            'google-tracking-->': grunt.file.read("templates/custom/google-tracking.tmpl"),
+            'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
+            'share-twitter-->': grunt.file.read("templates/custom/share-twitter.tmpl"),
+            'share-facebook-->': grunt.file.read("templates/custom/share-facebook.tmpl")
+          },
+          prefix: '<!--@@'
+        },
+        files: {
+          'public/index.html': ['public/index.html']
+        }
+      }
+    },
     jslint: {
       files: ['app/**/*.js'],
       directives: {
@@ -32,8 +53,8 @@ module.exports = function(grunt) {
     copy: {
       main: {
         files: [
-          {src: ['svgs/stack/stack.svg'], dest: 'public/assets/stack.svg', filter: 'isFile'}, // includes files in path
-          {src: ['public/styles.css'], dest: 'reloadhack/styles.css', filter: 'isFile'} // 
+          {src: ['svgs/stack/stack.svg'], dest: 'public/assets/stack.svg', filter: 'isFile'},
+          {src: ['templates/index.html'], dest: 'public/index.html', filter: 'isFile'}
         ]
       }
     },
@@ -91,7 +112,7 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'lint jshint concat min');
-  grunt.registerTask('build', 'browserify less concat copy reload mincss min');
-  grunt.registerTask('build:dev', 'browserify less concat copy');
-
+  grunt.registerTask('build', 'browserify less concat copy replace reload mincss min');
+  grunt.registerTask('build:dev', 'browserify less concat copy replace');
+  grunt.registerTask('build:template', 'copy replace');
 };

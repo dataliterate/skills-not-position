@@ -6,8 +6,9 @@ var Settings = function() {
 };
 
 _.extend(Settings.prototype, {
-  N_STATEMENTS: 8,
-  SETUP: false,
+  N_STATEMENTS: 2,
+  SETUP: (window.location.search.indexOf('setup') !== -1),
+  TRACK: true,
   initialize: function() {
     
   }
