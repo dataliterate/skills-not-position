@@ -1,10 +1,11 @@
 Skills, not positions
 ===========
 
-A design study, that lets people rate statements (or skills) to find their
-perfect job position, based on a slider element with experimental input methods.
-Built as tiny responive HTML5 Singlepage App, with [Backbone.js](http://backbonejs.org/),
-[Less](http://lesscss.org) and [Grunt](http://http://gruntjs.com/)
+A design study, that let people rate skills and statements to find their
+perfect job position. Based on an experimental slider element with different
+input methods. Built as tiny responive HTML5 Singlepage App for multiple
+devices, with [Backbone.js](http://backbonejs.org/), [Less](http://lesscss.org)
+and [Grunt](http://http://gruntjs.com/)
 
 Live
 -----------
