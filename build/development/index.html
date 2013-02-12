@@ -1,0 +1,141 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <title>#designposition</title>
+  
+  <!--head-->
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <meta property="og:image" content="positionfinder.png">
+  <meta property="og:title" content="#designposition - find your perfect design position">
+</head>
+<body class="teaser-open">
+  <div id="teaser">
+    <div class="content">
+      Find your perfect #designposition. Start &raquo;
+    </div>
+  </div>
+  <div id="app">
+
+  </div>
+
+<script type="text/template" id="app-tmpl">
+  <header>
+    <div class="for-statement">
+      <h1>Rate this statement</h1>
+      <div id="indicator"></div>
+    </div>
+    <div class="for-position">
+      <h1>My position</h1>
+    </div>
+  </header>
+  <div id="position"></div>
+  <div id="skill">
+
+  </div>
+  <div id="input">
+
+  </div>
+  <div id="setup">
+
+  </div>
+  <footer>
+    <ul class="input-options">
+      <li>
+      <img id="input-mic" title="speechinput (e.g. say '60 percent')" src="assets/stack.svg#voice" class="svg" width="71px" height="125px">
+      </li>
+      <li>
+      <img id="input-mouse" title="drag slider with your mouse" src="assets/stack.svg#mouse" class="svg" width="63.268px" height="103.645px">
+      </li>
+      <li>
+      <img id="input-keyboard" title="use numbers and arrows on your keybord (photoshop opacity style)" src="assets/stack.svg#keyboard" class="svg" width="103.826px" height="66.486px">
+      </li>
+      <li>
+        <img id="input-touch" alt="touch" src="assets/stack.svg#touch" class="svg" width="78.879px" height="125.906px">
+      </li>
+    </ul>
+    <p>
+      Brought to you by <a href="http://precious-forever.com">precious design studio</a>.<span class="break"><br></span> <a href="">Fork me on github</a>.
+    </p>
+  </footer>
+</script>
+<script type="text/template" id="skill-tmpl">
+<div class="skill">
+  <h2><span class="quote">&raquo; </span>{{ title }}</h2>
+</div>
+</script>
+<script type="text/template" id="input-element-tmpl">
+<div id="scores">
+  <input id="speechinput" type="text" x-webkit-speech speech>
+  <div class="indicator"><div class="indicator-wrapper"><div class="indicator-icon"></div></div></div>
+  <p>
+    <strong id="score">50</strong><span class="unit">%</span> true
+  </p>
+  <button id="submit"><img src="assets/stack.svg#arrow" class="svg" width="29px" height="55px"></button>
+  <input type="range" id="scorer" value="50">
+  <input type="number" id="ios-keyboard">
+</div>
+</script>
+<script type="text/template" id="setup-tmpl">
+<div class="content">
+<h2>Setup</h2>
+<ul>
+</ul>
+</div>
+<div class="submit">
+  <button id="setup-export">Export</button>
+  <textarea id="setup-export-output"></textarea>
+</div>
+</script>
+<script type="text/template" id="setup-skill-tmpl">
+<div class="<%= skillid %>">
+  <h3>{{ title }}</h3>
+  <div class="words">
+    {{ words }}
+  </div>
+</div>
+</script>
+<script type="text/template" id="result-tmpl">
+<div class="result">
+  <h2>{{ position }}</h2>
+  <div class="sharing">
+    <div class="options">
+      <button class="twitter"><strong>Tweet this</strong></button>
+      <button class="facebook" data-appid="<!--@@facebook-appid-->"><strong>Post on Facebook</strong></button>
+    </div>
+  </div>
+    <div class="apply">
+    <div class="content">
+      <h3>Join us at precious</h3>
+      <p>We are looking for a {{ position }} to join our team. If you are passionate about creating great digital products and services, have a healthy obsession about details and unconditional love for design, please get in touch.
+      <p><button id="apply" href="mailto:jobs@precious-forever.com">Apply now</button> or <a href="http://precious-forever.com/join-us">Learn more about us</a></p>
+      <p></p>
+    </div>
+  </div>
+</div>
+</script>
+<script type="text/template" id="share-twitter-tmpl">
+My #designposition: {{ position }} - What's yours? http://bit.ly/design-positions
+</script>
+<script type="text/template" id="share-facebook-tmpl">
+My #designposition: {{ position }} - What's yours? http://bit.ly/design-positions
+</script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-128032-26']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+
+</body>
+</html>

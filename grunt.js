@@ -16,8 +16,8 @@ module.exports = function(grunt) {
     settings: grunt.file.readJSON('settings.json'),
     clean: {
       tmp: "tmp",
-      buildProduction: "build/production",
-      buildDev: "build/dev"
+      production: "build/production",
+      development: "build/dev"
     },
     replace: {
       production: {
@@ -153,8 +153,8 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', 'build');
-  grunt.registerTask('build', 'clean browserify less concat mincss min copy:production replace:production');
-  grunt.registerTask('build:dev', 'jslint clean browserify less concat copy:development replace:development');
+  grunt.registerTask('build', 'clean:production browserify less concat mincss min copy:production replace:production');
+  grunt.registerTask('build:dev', 'jslint clean:development browserify less concat copy:development replace:development');
   grunt.registerTask('build:template', 'copy:production replace:production');
   grunt.registerTask('watch', 'watch build:dev reload');
 };
