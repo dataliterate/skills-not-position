@@ -14,6 +14,8 @@
     "grunt-contrib-copy": "*",
     "grunt-less": "*",
     "backbone": "*",
+    "underscore": "*",
+    "jquery-browserify": "*",
     "grunt-contrib-mincss": "~0.3.2",
     "grunt-yui-compressor": "~0.1.1",
     "grunt-contrib-jshint": "~0.1.0",
