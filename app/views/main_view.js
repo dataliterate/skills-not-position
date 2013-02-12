@@ -30,7 +30,6 @@ module.exports = MainView = Backbone.View.extend({
       this.listenTo(this.inputElement, 'change', this.changeScore);
 
       this.listenTo(this.model, 'change:skillPos', this.skillChange);
-      
     },
 
     render: function() {
@@ -112,7 +111,7 @@ module.exports = MainView = Backbone.View.extend({
     },
     skillChange: function(e) {
       var currentSkill = this.model.currentSkill();
-      if(currentSkill === null) {
+      if(currentSkill === undefined) {
         return;
       }
       this.statementLayout();
