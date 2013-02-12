@@ -22,19 +22,19 @@ How to create position generator with custom statements
 How to really customize the position generator
 -----------
 
-1. Prerequisites
+### Prerequisites
 - [Node.js + npm](http://http://nodejs.org/)
 - [grunt 0.3](http://http://gruntjs.com/)
 - [svg-stacker](https://github.com/preciousforever/SVG-Stacker)
 
-2. Installation
+### Installation
 ```
 git clone git@github.com:preciousforever/skills-not-position.git
 cd skills-not-position
 npm install
 ```
 
-3. Customize
+### Customize
 Edit
 - settings.json (Build Configuration)
 - app/settings.js (JS Configuration)
@@ -42,13 +42,13 @@ Edit
 - less/styles.less
 
 
-4. Build
+### Build
 ```
 grunt build
 grunt build:dev
 ```
 
-5. Development (Watch)
+### Development (Watch)
 ```
 grunt watch
 ```
