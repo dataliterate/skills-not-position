@@ -30,14 +30,10 @@ var Router = Backbone.Router.extend({
   position: function() {
     
     if(!this.hasSession()) {
-      this.navigate('');
+      this.navigate('', {trigger: true});
       return;
     }
     
-    //if(!this.hasSession()) {
-    //  this.startSession();
-    //}
-    this.navigate('position', {trigger: true});
     this.session.set({'skillPos': null});
     this.mainView.showPosition();
   },
