@@ -13771,7 +13771,7 @@ var Settings = function() {
 };
 
 _.extend(Settings.prototype, {
-  N_STATEMENTS: 2,
+  N_STATEMENTS: 8,
   SETUP: (window.location.search.indexOf('setup') !== -1),
   TRACK: (window._gaq),
   initialize: function() {
@@ -13922,15 +13922,16 @@ module.exports = Session = Backbone.Model.extend({
     Attitude [, Attitude] Level Field [Field] [Title] Designer
     */
     var title = grouped.attitude[0].get('title');
+    title = title.charAt(0).toUpperCase() + title.slice(1);
     if(grouped.attitude[0].get('orderScore') - grouped.attitude[1].get('orderScore') < groupRanges.attitude.range / 10) {
       title += ', ' + grouped.attitude[1].get('title');
     }
-    title += ' ' + _.first(grouped.level).get('title');
-    title += ' ' + grouped.field[0].get('title');
+    title += _.first(grouped.level).get('title');
+    title += ' ' + grouped.field[0].get('title') + '-';
     if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 20) {
-      title += ' & ' + grouped.field[1].get('title');
+      title += ' & ' + grouped.field[1].get('title') + '-';
     }
-    title += ' ' + _.first(grouped.title).get('title');
+    title += _.first(grouped.title).get('title');
     return title;
 
   }
@@ -14314,11 +14315,15 @@ module.exports = MainView = Backbone.View.extend({
         // create email link
         var mailto = 'mailto:jobs@precious-forever.com';
         mailto += '?subject=' + window.escape('Application as ' + position);
-        var text = 'Dear precious,' + "\n" + "\n";
-        text += '[x] here is the URL to my work samples:' + "\n" + "\n";
-        text += '[x] I\'ve attached my CV' + "\n" + "\n";
-        text += '[ ] Here is a link to my CV' + "\n" + "\n" + "\n" + "\n";
-        text += '[x] This is how I rated the statements, which lead to my #designposition' + "\n";
+        var text = 'Hi precious,' + "\n" + "\n";
+        text += '"' + position + '" describes me' + "\n" + "\n";
+        text += '[x] very well' + "\n";
+        text += '[  ] kind of' + "\n";
+        text += '[  ] not at all' + "\n" + "\n";
+        text += 'beacause [WRITE SOMETHING]' + "\n" + "\n" + "\n";
+        text += 'T s c h u e s s,' + "\n" + "\n";
+        text += '____' + "\n" + "\n";
+        text += 'P.S.: I don\'t mind sharing my ratings:' + "\n";
         text += this.model.skills.getScores();
 
         mailto += '&body=' + window.escape(text);
