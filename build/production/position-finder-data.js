@@ -11,9 +11,9 @@ Title:
 */
 window.PositionFinderData = {
   'words': {
-    'attitude': ['Enthusiastic', 'Motivated', 'Open-minded', 'Critical', 'Innovative', 'Focused', 'Technology-Loving', 'Hands-On', 'Curious', 'Organized'],
-    'level': ['Senior-level', 'Experienced', 'Lead', 'Head of', 'Chief'],
-    'field': ['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Code', 'Mobile', 'Digital Product', 'App', 'Multiscreen'],
+    'attitude': ['enthusiastic', 'motivated', 'open-minded', 'critical', 'innovative', 'focused', 'technology-loving', 'hands-on', 'curious', 'organized'],
+    'level': [', senior-level', ', experienced', ' Lead', ' Chief'],
+    'field': ['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Mobile', 'Product', 'App', 'Multiscreen'],
     'title': ['Design Architect', 'Design Evanglist', 'Designer', 'Design Hacker', 'Design Engineer', 'Design Strategist']
   },
   'skills': [{

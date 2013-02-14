@@ -137,15 +137,16 @@ module.exports = Session = Backbone.Model.extend({
     Attitude [, Attitude] Level Field [Field] [Title] Designer
     */
     var title = grouped.attitude[0].get('title');
+    title = title.charAt(0).toUpperCase() + title.slice(1);
     if(grouped.attitude[0].get('orderScore') - grouped.attitude[1].get('orderScore') < groupRanges.attitude.range / 10) {
       title += ', ' + grouped.attitude[1].get('title');
     }
-    title += ' ' + _.first(grouped.level).get('title');
-    title += ' ' + grouped.field[0].get('title');
+    title += _.first(grouped.level).get('title');
+    title += ' ' + grouped.field[0].get('title') + '-';
     if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 20) {
-      title += ' & ' + grouped.field[1].get('title');
+      title += ' & ' + grouped.field[1].get('title') + '-';
     }
-    title += ' ' + _.first(grouped.title).get('title');
+    title += _.first(grouped.title).get('title');
     return title;
 
   }
