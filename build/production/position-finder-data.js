@@ -17,7 +17,7 @@ window.PositionFinderData = {
     'title': ['Design Architect', 'Design Evanglist', 'Designer', 'Design Hacker', 'Design Engineer', 'Design Strategist']
   },
   'skills': [{
-  title: 'I can spend a whole day optimizing at zoom level 3200%',
+  title: 'I could spend the whole day in 3200% zoomed view',
   quantifiers: {
     'Visual': 10,
     'Designer': 10,
@@ -36,13 +36,6 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'I think, Design Thinking is a cliché',
-  quantifiers: {
-    'Critical': 10,
-    'Design Evanglist': 10
-  }
-},
-{
   title: 'I am able to develop visual languages, from idea to product',
   quantifiers: {
     'Visual': 10,
@@ -56,14 +49,14 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'It\'s more likely to find a book about design on my nightstand than a novel',
+  title: 'I\'d rather have a book about design on my nightstand than a novel',
   quantifiers: {
     'Motivated': 10,
     'Curious': 4
   }
 },
 {
-  title: 'I\'m an app store shopaholic',
+  title: 'I\'m an app-oholic ',
   quantifiers: {
     'Technology-Loving': 5,
     'Curious': 7,
@@ -95,7 +88,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'I can see the big picture outside my canvas',
+  title: 'When I look at a pixel on my screen, I have the big picture in my mind',
   quantifiers: {
     'Open-minded': 10,
     'Head of': 10,
@@ -158,7 +151,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'I like to share my knowledge, even offtopic',
+  title: 'I like to share my knowledge (even if it\'s off-topic)',
   quantifiers: {
     'Enthusiastic': 10,
     'Lead': 10,
@@ -166,7 +159,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'Agile is my middlename',
+  title: 'Agile is my middle name',
   quantifiers: {
     'Hands-On': 10,
     'Technology-Loving': 4,
@@ -207,7 +200,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'I read more code than books',
+  title: 'I read more code than I read books',
   quantifiers: {
     'Code': 10,
     'Technology-Loving': 10,
@@ -245,7 +238,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'Paper is for sketching, what salt is for cooking',
+  title: 'Paper is to sketching, as salt is to cooking',
   quantifiers: {
     'Hands-On': 10,
     'Chief': 5,
@@ -256,7 +249,7 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'Web Inspector is my co-pilot, when browsing the web',
+  title: 'Web Inspector is my co-pilot when browsing the web',
   quantifiers: {
     'Curious': 10,
     'Technology-Loving': 6,
@@ -268,14 +261,14 @@ window.PositionFinderData = {
   }
 },
 {
-  title: 'I watched "Helvetica" more often than "Titanic"',
+  title: 'I\'ve watched "Helvetica" more times than "Titanic"',
   quantifiers: {
     'Visual': 10,
     'Designer': 10
   }
 },
 {
-  title: 'I love to question established workflows',
+  title: 'I like to question established workflows',
   quantifiers: {
     'Critical': 10,
     'Innovative': 10
