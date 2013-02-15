@@ -211,6 +211,7 @@ module.exports = InputElement = Backbone.View.extend({
       var gray = Math.floor(base + this.value / 100 * range);
 
       $('body').css('background', 'RGB(' + gray + ', '+ gray + ', ' + gray + ')');
+      $('#speechinput').removeClass('error');
       
     },
     set: function(v) {

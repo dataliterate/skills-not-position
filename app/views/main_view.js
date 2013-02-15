@@ -174,7 +174,15 @@ module.exports = MainView = Backbone.View.extend({
       if(Settings.TRACK) {
         _gaq.push(['_trackEvent', 'Position', 'generated', position]);
       }
-      var html = this.resultTemplate({position: position});
+
+      var positionInText = position; //.charAt(0).toLowerCase() + position.slice(1);
+      if (['A', 'E', 'U', 'O'].indexOf(positionInText.charAt(0)) !== -1) {
+        positionInText = 'an <em>' + positionInText + '</em>';
+      } else {
+        positionInText = 'a <em>' + positionInText + '</em>';
+      }
+
+      var html = this.resultTemplate({position: position, positionInText: positionInText});
       $('#position').html(html);
       this.positionLayout();
 

@@ -8,7 +8,7 @@ var _ =  require('underscore')
 var Router = Backbone.Router.extend({
   routes:{
     'statement/:n': 'statement',
-    'position': 'position',
+    'result': 'position',
     '': 'defaultRoute'
   },
   session: null,
@@ -54,7 +54,7 @@ var Router = Backbone.Router.extend({
     this.navigate('statement/' + (skillPos + 2), {trigger: true});
   },
   gotoPosition: function() {
-    this.navigate('position', {trigger: true});
+    this.navigate('result', {trigger: true});
   }
 });
 
