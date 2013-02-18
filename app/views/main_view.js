@@ -186,13 +186,32 @@ module.exports = MainView = Backbone.View.extend({
 
       var html = '';
       if(position.special === false) {
-        html = this.resultTemplate({position: position.title, positionInText: positionInText});
+        html = this.resultTemplate({position: position.title, positionInText: positionInText, parts: position.parts});
       } else {
-        html = this.badResultTemplate({special: position.special, position: position.title, positionInText: positionInText});
+        html = this.badResultTemplate({special: position.special, position: position.title, positionInText: positionInText, parts: [position]});
       }
 
       $('#position').html(html);
       this.positionLayout();
+
+      var i = 0;
+      $('.o').each(function() {
+        i++;
+        var $w = $(this);
+        var processing = function() {
+          $w.addClass('processing');
+          var show = function() {
+            $w.addClass('done');
+            var $m = $w.find('.meter');
+            var showText = function() {
+              $w.addClass('text').removeClass('processing');
+            }
+            window.setTimeout(showText, 500);
+          }
+          window.setTimeout(show, 50);
+        }
+        window.setTimeout(processing, 450 * i);
+      });
 
       $('button.twitter').click(function(e) {
         if(Settings.TRACK) {

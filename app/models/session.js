@@ -115,6 +115,7 @@ module.exports = Session = Backbone.Model.extend({
     var groups = this.words.getGroups();
     var grouped = {};
     var groupRanges = {};
+
     _.each(groups, function(group) {
       
       var words = AppWords.getWordsInGroup(group);
@@ -131,23 +132,57 @@ module.exports = Session = Backbone.Model.extend({
       
     });
 
+    var parts = [];
     /**
     grammar
     --
     Attitude [, Attitude] Level Field [Field] [Title] Designer
     */
-    var title = grouped.attitude[0].get('title');
-    title = title.charAt(0).toUpperCase() + title.slice(1);
+    var title = '';
+    var firstAttitude = grouped.attitude[0].get('title');
+    firstAttitude = firstAttitude.charAt(0).toUpperCase() + firstAttitude.slice(1);
+    var lastAttitude = firstAttitude;
+
     if(grouped.attitude[0].get('orderScore') - grouped.attitude[1].get('orderScore') < groupRanges.attitude.range / 10) {
-      title += ', ' + grouped.attitude[1].get('title');
+      var secondAttitude = grouped.attitude[1].get('title');
+      
+      title += firstAttitude + ', ';
+      parts.push(firstAttitude + ', ');
+      lastAttitude = secondAttitude;
     }
-    title += _.first(grouped.level).get('title');
-    title += ' ' + grouped.field[0].get('title') + '-';
+    
+
+    var level = _.first(grouped.level).get('title');
+    // What the hack!! if first letter is lowercase add a comma
+    if(level.charAt(0).toLowerCase() == level.charAt(0)) {
+      lastAttitude += ',';
+    }
+    level = ' ' + level;
+
+    title += lastAttitude;
+    parts.push(lastAttitude);
+
+    title += level;
+    parts.push(level);
+
+    var firstField = ' ' + grouped.field[0].get('title') + '-';
+    title += firstField;
+
+
     if(grouped.field[0].get('orderScore') - grouped.field[1].get('orderScore') < groupRanges.field.range / 20) {
-      title += ' & ' + grouped.field[1].get('title') + '-';
+      var secondField = grouped.field[1].get('title') + '-';
+
+      title += ' & ' + secondField;
+      firstField += ' & ';
+      parts.push(firstField);
+      parts.push(secondField);
+    } else {
+      parts.push(firstField);
     }
-    title += _.first(grouped.title).get('title');
-    return {special: false, title: title};
+    var position = _.first(grouped.title).get('title');
+    title += position;
+    parts.push(position);
+    return {special: false, title: title, parts: parts};
 
   }
 });
