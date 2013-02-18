@@ -229,7 +229,7 @@ module.exports = MainView = Backbone.View.extend({
         e.preventDefault();
         // create email link
         var mailto = 'mailto:jobs@precious-forever.com';
-        mailto += '?subject=' + window.escape('Application as ' + position.title);
+        mailto += '?subject=' + window.escape(position.title);
         var text = 'Hi precious,' + "\n" + "\n";
         text += '"' + position.title + '" describes me' + "\n" + "\n";
         text += '[x] very well' + "\n";
