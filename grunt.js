@@ -31,6 +31,7 @@ module.exports = function(grunt) {
             'longtitle-->': '<%= settings.longtitle %>',
             'google-tracking-->': grunt.file.read("templates/custom/google-tracking.tmpl"),
             'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
+            'do-not-join-us-->': grunt.file.read("templates/custom/do-not-join-us.tmpl"),
             'share-twitter-->': grunt.file.read("templates/custom/share-twitter.tmpl"),
             'share-facebook-->': grunt.file.read("templates/custom/share-facebook.tmpl")
           },
@@ -50,6 +51,7 @@ module.exports = function(grunt) {
             'longtitle-->': '<%= settings.longtitle %>',
             'google-tracking-->': '',
             'join-us-->': grunt.file.read("templates/custom/join-us.tmpl"),
+            'do-not-join-us-->': grunt.file.read("templates/custom/do-not-join-us.tmpl"),
             'share-twitter-->': grunt.file.read("templates/custom/share-twitter.tmpl"),
             'share-facebook-->': grunt.file.read("templates/custom/share-facebook.tmpl")
           },
@@ -155,7 +157,8 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', 'build');
   grunt.registerTask('build', 'jslint clean:production browserify less concat mincss min copy:production replace:production clean:tmp');
-  grunt.registerTask('build:dev', 'clean:development browserify less concat copy:development replace:development clean:tmp');
+  //grunt.registerTask('build:dev', 'clean:development browserify less concat copy:development replace:development clean:tmp');
+  grunt.registerTask('build:dev', 'browserify less concat copy:development replace:development clean:tmp');
   grunt.registerTask('build:template', 'copy:production replace:production');
   
 };
