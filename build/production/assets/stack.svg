@@ -27,7 +27,7 @@
 	<path fill="#FFFFFF" d="M108.697,21.533c0-6.222-5.045-11.267-11.266-11.267c-6.224,0-11.267,5.045-11.267,11.267   c0,4.291,2.399,8.02,5.928,9.922l-15.27,20.841l-19.92-30.065c4.989-1.159,8.711-5.623,8.711-10.964C65.614,5.045,60.57,0,54.348,0   c-6.223,0-11.266,5.045-11.266,11.267c0,5.289,3.65,9.715,8.565,10.927L31.781,52.297L16.547,31.482   c3.56-1.894,5.984-5.637,5.984-9.949c0-6.222-5.044-11.267-11.266-11.267C5.043,10.266,0,15.312,0,21.533   c0,5.787,4.366,10.551,9.982,11.188l3.283,51.233h82.166l3.277-51.232C104.328,32.086,108.697,27.322,108.697,21.533z"/>
 </g>
 </svg>
-<svg  xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" width="13px" height="25px" viewBox="0 0 13 25" version="1.1" class="i" id="facebook">
+<svg  xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" viewBox="0 0 13 25" version="1.1" class="i" id="facebook">
     <title>Slice 1</title>
     <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
     <defs/>
@@ -59,7 +59,7 @@
 	</g>
 </g>
 </svg>
-<svg  xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" width="26px" height="21px" viewBox="0 0 26 21" version="1.1" class="i" id="twitter">
+<svg  xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" viewBox="0 0 26 21" version="1.1" class="i" id="twitter">
     <title>Slice 1</title>
     <description>Created with Sketch (http://www.bohemiancoding.com/sketch)</description>
     <defs/>

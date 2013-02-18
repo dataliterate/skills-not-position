@@ -12,7 +12,7 @@ Title:
 window.PositionFinderData = {
   'words': {
     'attitude': ['enthusiastic', 'motivated', 'open-minded', 'critical', 'innovative', 'focused', 'technology-loving', 'hands-on', 'curious', 'organized'],
-    'level': [', senior-level', ', experienced', ' Lead', ' Chief'],
+    'level': ['senior-level', 'experienced', 'Lead', 'Chief'],
     'field': ['UX', 'UI', 'IxD', 'Visual', 'Frontend', 'Mobile', 'Product', 'App', 'Multiscreen'],
     'title': ['Design Architect', 'Design Evanglist', 'Designer', 'Design Hacker', 'Design Engineer', 'Design Strategist']
   },

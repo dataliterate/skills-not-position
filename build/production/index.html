@@ -100,7 +100,13 @@
 </script>
 <script type="text/template" id="result-tmpl">
 <div class="result">
-  <h2>{{ position }}</h2>
+  <div class="title">
+  <h2>
+  {[ _.each(parts, function(part){ ]}
+    <span class="o"><span class="m"></span><span class="i">{{ part }}</span></span>
+  {[ }) ]}
+  </h2>
+  </div>
   <div class="sharing">
     <div class="options">
       <button class="twitter"><strong>Tweet this</strong></button>
@@ -119,6 +125,36 @@
         team (at the moment we are just 4 people), often collaborating closely with our clients and other partners.
       </p>
       <p><button id="apply" href="mailto:jobs@precious-forever.com">Get in touch</button> or <a href="http://precious-forever.com/join-us">Learn more</a></p>
+    </div>
+  </div>
+</div>
+</script>
+<script type="text/template" id="bad-result-tmpl">
+<div class="result">
+  <h2>{{ position }}</h2>
+  <div class="sharing">
+    <div class="options">
+      <button class="twitter"><strong>Tweet this</strong></button>
+      <button class="facebook" data-appid="<!--@@facebook-appid-->"><strong>Post on Facebook</strong></button>
+    </div>
+  </div>
+    <div class="apply">
+    <div class="content">
+      {[ if(special == '100') { ]}
+      <p>
+        Sorry, we don't believe in perfectionism!
+        
+      </p>
+      {[ } else if(special == 'avg') { ]}
+      <p>
+        We are not looking for Average Designers!
+      </p>
+      {[ } else { ]}
+      <p>
+        We are not looking for Tax Accountants!
+      </p>
+      {[ } ]}
+      <p><button href="http://designposition.precious-forever.com">Start again</button></p>
     </div>
   </div>
 </div>
