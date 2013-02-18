@@ -104,11 +104,11 @@ module.exports = Session = Backbone.Model.extend({
     if(exception !== false) {
       switch(exception) {
         case 'avg':
-          return 'Average Designer';
+          return {special: 'avg', title: 'Average Designer'};
         case '100':
-          return 'Highscore Hero';
+          return {special: 100, title: 'High-Flyer'};
         case '0':
-          return 'Tax Accountant';
+          return {special: 0, title: 'Tax Accountant'};
       }
     }
 
@@ -147,7 +147,7 @@ module.exports = Session = Backbone.Model.extend({
       title += ' & ' + grouped.field[1].get('title') + '-';
     }
     title += _.first(grouped.title).get('title');
-    return title;
+    return {special: false, title: title};
 
   }
 });

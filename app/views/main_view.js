@@ -14,6 +14,7 @@ module.exports = MainView = Backbone.View.extend({
     el: '#app',
     appTemplate: _.template($('#app-tmpl').html()),
     resultTemplate: _.template($('#result-tmpl').html()),
+    badResultTemplate: _.template($('#bad-result-tmpl').html()),
     /*
     events: {
       'keypress #app': 'onKeyDown'
@@ -172,17 +173,24 @@ module.exports = MainView = Backbone.View.extend({
     showPosition: function() {
       var position = this.model.getPosition();
       if(Settings.TRACK) {
-        _gaq.push(['_trackEvent', 'Position', 'generated', position]);
+        _gaq.push(['_trackEvent', 'Position', 'generated', position.title]);
       }
 
-      var positionInText = position; //.charAt(0).toLowerCase() + position.slice(1);
+      var positionInText = position.title; //.charAt(0).toLowerCase() + position.slice(1);
       if (['A', 'E', 'U', 'O'].indexOf(positionInText.charAt(0)) !== -1) {
         positionInText = 'an <em>' + positionInText + '</em>';
       } else {
         positionInText = 'a <em>' + positionInText + '</em>';
       }
 
-      var html = this.resultTemplate({position: position, positionInText: positionInText});
+
+      var html = '';
+      if(position.special === false) {
+        html = this.resultTemplate({position: position.title, positionInText: positionInText});
+      } else {
+        html = this.badResultTemplate({special: position.special, position: position.title, positionInText: positionInText});
+      }
+
       $('#position').html(html);
       this.positionLayout();
 
@@ -190,7 +198,7 @@ module.exports = MainView = Backbone.View.extend({
         if(Settings.TRACK) {
           _gaq.push(['_trackEvent', 'Social', 'twitter-shared']);
         }
-        var text = _.template($('#share-twitter-tmpl').html(), {position: position});
+        var text = _.template($('#share-twitter-tmpl').html(), {position: position.title});
         var url = "https://twitter.com/intent/tweet?text=" + window.escape(text);
         window.open(url, "twitter", "status=1, height=500, width=360, resizable=0");
       });
@@ -202,13 +210,13 @@ module.exports = MainView = Backbone.View.extend({
         e.preventDefault();
         // create email link
         var mailto = 'mailto:jobs@precious-forever.com';
-        mailto += '?subject=' + window.escape('Application as ' + position);
+        mailto += '?subject=' + window.escape('Application as ' + position.title);
         var text = 'Hi precious,' + "\n" + "\n";
-        text += '"' + position + '" describes me' + "\n" + "\n";
+        text += '"' + position.title + '" describes me' + "\n" + "\n";
         text += '[x] very well' + "\n";
         text += '[  ] kind of' + "\n";
         text += '[  ] not at all' + "\n" + "\n";
-        text += 'beacause [WRITE SOMETHING]' + "\n" + "\n" + "\n";
+        text += 'because [WRITE SOMETHING]' + "\n" + "\n" + "\n";
         text += 'T s c h u e s s,' + "\n" + "\n";
         text += '____' + "\n" + "\n";
         text += 'P.S.: I don\'t mind sharing my ratings:' + "\n";
@@ -229,7 +237,7 @@ module.exports = MainView = Backbone.View.extend({
         if(Settings.TRACK) {
           _gaq.push(['_trackEvent', 'Social', 'facebook-shared']);
         }
-        var text = _.template($('#share-facebook-tmpl').html(), {position: position});
+        var text = _.template($('#share-facebook-tmpl').html(), {position: position.title});
         var url = window.location.href.replace(window.location.hash, '');
         var query = 'p[title]=' + window.escape(window.document.title);
         query += '&p[images][0]=' + window.escape(url + 'positionfinder.png');
