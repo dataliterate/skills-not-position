@@ -154,7 +154,7 @@ module.exports = Session = Backbone.Model.extend({
 
     var level = _.first(grouped.level).get('title');
     // What the hack!! if first letter is lowercase add a comma
-    if(level.charAt(0).toLowerCase() == level.charAt(0)) {
+    if(level.charAt(0).toLowerCase() === level.charAt(0)) {
       lastAttitude += ',';
     }
     level = ' ' + level;

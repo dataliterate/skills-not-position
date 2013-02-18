@@ -205,11 +205,11 @@ module.exports = MainView = Backbone.View.extend({
             var $m = $w.find('.meter');
             var showText = function() {
               $w.addClass('text').removeClass('processing');
-            }
+            };
             window.setTimeout(showText, 500);
-          }
+          };
           window.setTimeout(show, 50);
-        }
+        };
         window.setTimeout(processing, 450 * i);
       });
 
