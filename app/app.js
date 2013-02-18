@@ -28,6 +28,7 @@ $(function() {
   });
 
   _.templateSettings = {
+    evaluate : /\{\[([\s\S]+?)\]\}/g,
     interpolate : /\{\{([\w\W]+?)\}\}/g
   };
 
