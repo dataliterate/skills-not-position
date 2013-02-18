@@ -99,11 +99,11 @@
 <script type="text/template" id="result-tmpl">
 <div class="result">
   <div class="title">
-  <h2>
-  {[ _.each(parts, function(part){ ]}
-    <span class="o"><span class="m"></span><span class="i">{{ part }}</span></span>
-  {[ }) ]}
-  </h2>
+    <h2>
+    {[ _.each(parts, function(part){ ]}
+      <span class="o"><span class="m"></span><span class="i">{{ part }}</span></span>
+    {[ }) ]}
+    </h2>
   </div>
   <div class="sharing">
     <div class="options">
@@ -116,7 +116,9 @@
 </script>
 <script type="text/template" id="bad-result-tmpl">
 <div class="result">
-  <h2>{{ position }}</h2>
+  <div class="title">
+    <h2>{{ position }}</h2>
+  </div>
   <div class="sharing">
     <div class="options">
       <button class="twitter"><strong>Tweet this</strong></button>
