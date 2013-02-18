@@ -101,11 +101,11 @@
 <script type="text/template" id="result-tmpl">
 <div class="result">
   <div class="title">
-  <h2>
-  {[ _.each(parts, function(part){ ]}
-    <span class="o"><span class="m"></span><span class="i">{{ part }}</span></span>
-  {[ }) ]}
-  </h2>
+    <h2>
+    {[ _.each(parts, function(part){ ]}
+      <span class="o"><span class="m"></span><span class="i">{{ part }}</span></span>
+    {[ }) ]}
+    </h2>
   </div>
   <div class="sharing">
     <div class="options">
@@ -131,7 +131,9 @@
 </script>
 <script type="text/template" id="bad-result-tmpl">
 <div class="result">
-  <h2>{{ position }}</h2>
+  <div class="title">
+    <h2>{{ position }}</h2>
+  </div>
   <div class="sharing">
     <div class="options">
       <button class="twitter"><strong>Tweet this</strong></button>
@@ -154,13 +156,13 @@
         We are not looking for Tax Accountants!
       </p>
       {[ } ]}
-      <p><button href="http://designposition.precious-forever.com">Start again</button></p>
+      <p><a class="restart" href="http://designposition.precious-forever.com">Start again</a></p>
     </div>
   </div>
 </div>
 </script>
 <script type="text/template" id="share-twitter-tmpl">
-My #designposition: {{ position }} - What's yours? http://is.gd/designposition
+My #designposition: {{ position }} - What's yours? http://j.mp/designposition
 </script>
 <script type="text/template" id="share-facebook-tmpl">
 My #designposition: {{ position }} - What's yours?
