@@ -122,11 +122,21 @@ module.exports = InputElement = Backbone.View.extend({
 
         // numeric input
         var num = null;
-        if(!isNaN(String.fromCharCode(keyCode))) {
+        /*
+        believe it or not, but isNaN(" ") evaluates to "false"
+        → http://stackoverflow.com/a/825466
+        added check if keycode is in the currect (numeric) range 
+        to make sure " " and "p" are ignored:
+        */
+        function is_within_numeric_range(key) {
+          return (key >= 48 && key <= 57);
+        }
+        if (!isNaN(String.fromCharCode(keyCode)) && is_within_numeric_range(keyCode)) {
           num = parseInt(String.fromCharCode(keyCode), 10);
-        } else if(!isNaN(String.fromCharCode(keyCode - 48))) {
+        } else if (!isNaN(String.fromCharCode(keyCode - 48)) && is_within_numeric_range(keyCode - 48)) {
           num = parseInt(String.fromCharCode(keyCode - 48), 10);
         }
+
         if(num === null) {
           return;
         }
