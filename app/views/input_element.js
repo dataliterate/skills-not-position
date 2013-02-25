@@ -128,12 +128,12 @@ module.exports = InputElement = Backbone.View.extend({
         added check if keycode is in the currect (numeric) range 
         to make sure " " and "p" are ignored:
         */
-        function is_within_numeric_range(key) {
+        function isWithinNumericRange(key) {
           return (key >= 48 && key <= 57);
         }
-        if (!isNaN(String.fromCharCode(keyCode)) && is_within_numeric_range(keyCode)) {
+        if (!isNaN(String.fromCharCode(keyCode)) && isWithinNumericRange(keyCode)) {
           num = parseInt(String.fromCharCode(keyCode), 10);
-        } else if (!isNaN(String.fromCharCode(keyCode - 48)) && is_within_numeric_range(keyCode - 48)) {
+        } else if (!isNaN(String.fromCharCode(keyCode - 48)) && isWithinNumericRange(keyCode - 48)) {
           num = parseInt(String.fromCharCode(keyCode - 48), 10);
         }
 
