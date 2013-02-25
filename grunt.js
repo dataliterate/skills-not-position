@@ -13,6 +13,7 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     settings: grunt.file.readJSON('settings.json'),
     clean: {
       tmp: "tmp",
@@ -26,6 +27,7 @@ module.exports = function(grunt) {
         options: {
           variables: {
             'title-->': '<%= settings.title %>',
+            'version-->': '<%= pkg.version %>',
             'head-->': grunt.file.read("templates/common/production-head.tmpl"),
             'livereload-->': '',
             'longtitle-->': '<%= settings.longtitle %>',
